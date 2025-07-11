@@ -34,7 +34,7 @@ public class SysTenant {
 
     @Column(name = "status", nullable = false)
     @Comment("状态（true=启用，false=禁用）")
-    private Boolean status;
+    private Boolean status = true;
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)

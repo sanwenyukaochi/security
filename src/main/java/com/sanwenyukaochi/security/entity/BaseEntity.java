@@ -28,7 +28,7 @@ public abstract class BaseEntity implements Serializable {
     @Comment("主键ID")
     private Long id;
     
-    @TenantId
+    // @TenantId
     @Column(name = "tenant_id", nullable = false)
     @Comment("租户ID")
     private Long tenantId;

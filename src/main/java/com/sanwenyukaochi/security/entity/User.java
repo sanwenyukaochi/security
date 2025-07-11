@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 })
 @EntityListeners(AuditingEntityListener.class)
 @Comment("用户表")
-public class SysUser extends BaseEntity{
+public class User extends BaseEntity{
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant", nullable = false)
