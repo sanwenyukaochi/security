@@ -60,15 +60,6 @@ public class UserCacheController {
     }
 
     /**
-     * 获取用户登录统计信息
-     */
-    @GetMapping("/stats/login")
-    public ResponseEntity<?> getLoginStats() {
-        Map<String, Object> stats = userPermissionCacheService.getUserLoginStats();
-        return ResponseEntity.ok(stats);
-    }
-
-    /**
      * 获取缓存统计信息
      */
     @GetMapping("/stats/cache")
@@ -136,27 +127,6 @@ public class UserCacheController {
     public ResponseEntity<?> getUserSessionInfo(@PathVariable Long userId) {
         Map<String, Object> sessionInfo = userPermissionCacheService.getUserSessionInfo(userId);
         return ResponseEntity.ok(sessionInfo);
-    }
-
-    /**
-     * 获取用户最后活跃时间
-     */
-    @GetMapping("/user/{userId}/last-active")
-    public ResponseEntity<?> getUserLastActiveTime(@PathVariable Long userId) {
-        java.util.Date lastActiveTime = userPermissionCacheService.getUserLastActiveTime(userId);
-        return ResponseEntity.ok(Map.of(
-            "userId", userId,
-            "lastActiveTime", lastActiveTime
-        ));
-    }
-
-    /**
-     * 更新用户最后活跃时间
-     */
-    @PostMapping("/user/{userId}/update-active")
-    public ResponseEntity<?> updateUserLastActiveTime(@PathVariable Long userId) {
-        userPermissionCacheService.updateUserLastActiveTime(userId);
-        return ResponseEntity.ok(Map.of("message", "用户活跃时间已更新", "userId", userId));
     }
 
     /**

@@ -56,10 +56,6 @@ public class UserPermissionCacheService {
         private List<PermissionInfo> permissions;
         private List<String> authorities;
         private List<MenuInfo> menus;
-        private Date loginTime;
-        private String loginIp;
-        private String browser;
-        private String os;
 
         // 构造函数、getter和setter
         public UserInfoVO() {}
@@ -74,9 +70,7 @@ public class UserPermissionCacheService {
             if (user.getTenant() != null) {
                 this.tenant = new TenantInfo(user.getTenant());
             }
-            this.loginTime = new Date();
         }
-
     }
 
     /**
@@ -370,22 +364,6 @@ public class UserPermissionCacheService {
     }
 
     /**
-     * 更新用户登录信息
-     */
-    public void updateUserLoginInfo(Long userId, String loginIp, String browser, String os) {
-        UserInfoVO userInfo = getUserInfo(userId);
-        if (userInfo != null) {
-            userInfo.setLoginIp(loginIp);
-            userInfo.setBrowser(browser);
-            userInfo.setOs(os);
-            userInfo.setLoginTime(new Date());
-            
-            String cacheKey = USER_INFO_CACHE_KEY + userId;
-            redisTemplate.opsForValue().set(cacheKey, userInfo, CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
-        }
-    }
-
-    /**
      * 清除用户权限缓存
      */
     public void clearUserCache(Long userId) {
@@ -451,55 +429,6 @@ public class UserPermissionCacheService {
     }
 
     /**
-     * 获取用户登录统计信息
-     */
-    public Map<String, Object> getUserLoginStats() {
-        Set<String> keys = redisTemplate.keys(USER_INFO_CACHE_KEY + "*");
-        if (keys == null || keys.isEmpty()) {
-            return new HashMap<>();
-        }
-        
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("totalOnlineUsers", keys.size());
-        
-        // 统计浏览器分布
-        Map<String, Integer> browserStats = new HashMap<>();
-        // 统计操作系统分布
-        Map<String, Integer> osStats = new HashMap<>();
-        // 统计IP分布
-        Map<String, Integer> ipStats = new HashMap<>();
-        
-        for (String key : keys) {
-            UserInfoVO userInfo = (UserInfoVO) redisTemplate.opsForValue().get(key);
-            if (userInfo != null) {
-                // 浏览器统计
-                String browser = userInfo.getBrowser();
-                if (browser != null) {
-                    browserStats.put(browser, browserStats.getOrDefault(browser, 0) + 1);
-                }
-                
-                // 操作系统统计
-                String os = userInfo.getOs();
-                if (os != null) {
-                    osStats.put(os, osStats.getOrDefault(os, 0) + 1);
-                }
-                
-                // IP统计
-                String ip = userInfo.getLoginIp();
-                if (ip != null) {
-                    ipStats.put(ip, ipStats.getOrDefault(ip, 0) + 1);
-                }
-            }
-        }
-        
-        stats.put("browserStats", browserStats);
-        stats.put("osStats", osStats);
-        stats.put("ipStats", ipStats);
-        
-        return stats;
-    }
-
-    /**
      * 强制用户下线
      */
     public void forceUserOffline(Long userId) {
@@ -525,19 +454,15 @@ public class UserPermissionCacheService {
         if (userInfo == null) {
             return new HashMap<>();
         }
-        
+
         Map<String, Object> sessionInfo = new HashMap<>();
         sessionInfo.put("userId", userInfo.getId());
         sessionInfo.put("userName", userInfo.getUserName());
-        sessionInfo.put("loginTime", userInfo.getLoginTime());
-        sessionInfo.put("loginIp", userInfo.getLoginIp());
-        sessionInfo.put("browser", userInfo.getBrowser());
-        sessionInfo.put("os", userInfo.getOs());
         sessionInfo.put("tenant", userInfo.getTenant());
         sessionInfo.put("roles", userInfo.getRoles());
         sessionInfo.put("permissions", userInfo.getPermissions());
         sessionInfo.put("authorities", userInfo.getAuthorities());
-        
+
         return sessionInfo;
     }
 
@@ -547,26 +472,6 @@ public class UserPermissionCacheService {
     public boolean isUserOnline(Long userId) {
         String cacheKey = USER_INFO_CACHE_KEY + userId;
         return Boolean.TRUE.equals(redisTemplate.hasKey(cacheKey));
-    }
-
-    /**
-     * 获取用户最后活跃时间
-     */
-    public Date getUserLastActiveTime(Long userId) {
-        UserInfoVO userInfo = getUserInfo(userId);
-        return userInfo != null ? userInfo.getLoginTime() : null;
-    }
-
-    /**
-     * 更新用户最后活跃时间
-     */
-    public void updateUserLastActiveTime(Long userId) {
-        UserInfoVO userInfo = getUserInfo(userId);
-        if (userInfo != null) {
-            userInfo.setLoginTime(new Date());
-            String cacheKey = USER_INFO_CACHE_KEY + userId;
-            redisTemplate.opsForValue().set(cacheKey, userInfo, CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
-        }
     }
 
     /**
@@ -689,7 +594,6 @@ public class UserPermissionCacheService {
         
         // 缓存状态
         detailedInfo.put("isOnline", isUserOnline(userId));
-        detailedInfo.put("lastActiveTime", getUserLastActiveTime(userId));
         detailedInfo.put("cacheKeys", getUserCacheKeys(userId));
         
         return detailedInfo;

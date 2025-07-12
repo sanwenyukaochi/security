@@ -10,7 +10,6 @@ import com.sanwenyukaochi.security.security.response.MessageResponse;
 import com.sanwenyukaochi.security.security.response.UserInfoResponse;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import com.sanwenyukaochi.security.service.UserPermissionCacheService;
-import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,18 +56,6 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        // 获取用户代理信息
-        String userAgentString = request.getHeader("User-Agent");
-        UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString);
-        
-        // 更新用户登录信息到Redis缓存
-        userPermissionCacheService.updateUserLoginInfo(
-            userDetails.getId(),
-            getClientIpAddress(request),
-            userAgent.getBrowser().getName(),
-            userAgent.getOperatingSystem().getName()
-        );
 
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
