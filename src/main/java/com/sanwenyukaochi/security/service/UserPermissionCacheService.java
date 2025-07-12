@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanwenyukaochi.security.entity.*;
 import com.sanwenyukaochi.security.repository.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ public class UserPermissionCacheService {
     /**
      * 用户详细信息VO类
      */
+    @Setter
+    @Getter
     public static class UserInfoVO {
         private Long id;
         private String userName;
@@ -73,53 +77,13 @@ public class UserPermissionCacheService {
             this.loginTime = new Date();
         }
 
-        // Getters and Setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        
-        public String getUserName() { return userName; }
-        public void setUserName(String userName) { this.userName = userName; }
-        
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        
-        public String getPhone() { return phone; }
-        public void setPhone(String phone) { this.phone = phone; }
-        
-        public Boolean getStatus() { return status; }
-        public void setStatus(Boolean status) { this.status = status; }
-        
-        public TenantInfo getTenant() { return tenant; }
-        public void setTenant(TenantInfo tenant) { this.tenant = tenant; }
-        
-        public List<RoleInfo> getRoles() { return roles; }
-        public void setRoles(List<RoleInfo> roles) { this.roles = roles; }
-        
-        public List<PermissionInfo> getPermissions() { return permissions; }
-        public void setPermissions(List<PermissionInfo> permissions) { this.permissions = permissions; }
-        
-        public List<String> getAuthorities() { return authorities; }
-        public void setAuthorities(List<String> authorities) { this.authorities = authorities; }
-        
-        public List<MenuInfo> getMenus() { return menus; }
-        public void setMenus(List<MenuInfo> menus) { this.menus = menus; }
-        
-        public Date getLoginTime() { return loginTime; }
-        public void setLoginTime(Date loginTime) { this.loginTime = loginTime; }
-        
-        public String getLoginIp() { return loginIp; }
-        public void setLoginIp(String loginIp) { this.loginIp = loginIp; }
-        
-        public String getBrowser() { return browser; }
-        public void setBrowser(String browser) { this.browser = browser; }
-        
-        public String getOs() { return os; }
-        public void setOs(String os) { this.os = os; }
     }
 
     /**
      * 角色信息VO类
      */
+    @Setter
+    @Getter
     public static class RoleInfo {
         private Long id;
         private String name;
@@ -137,26 +101,13 @@ public class UserPermissionCacheService {
             this.status = role.getStatus();
         }
 
-        // Getters and Setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-        
-        public Integer getDataScope() { return dataScope; }
-        public void setDataScope(Integer dataScope) { this.dataScope = dataScope; }
-        
-        public Boolean getStatus() { return status; }
-        public void setStatus(Boolean status) { this.status = status; }
     }
 
     /**
      * 权限信息VO类
      */
+    @Setter
+    @Getter
     public static class PermissionInfo {
         private Long id;
         private String name;
@@ -180,35 +131,13 @@ public class UserPermissionCacheService {
             this.visible = permission.getVisible();
         }
 
-        // Getters and Setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-        
-        public String getType() { return type; }
-        public void setType(String type) { this.type = type; }
-        
-        public String getPath() { return path; }
-        public void setPath(String path) { this.path = path; }
-        
-        public Long getParentId() { return parentId; }
-        public void setParentId(Long parentId) { this.parentId = parentId; }
-        
-        public Integer getSort() { return sort; }
-        public void setSort(Integer sort) { this.sort = sort; }
-        
-        public Boolean getVisible() { return visible; }
-        public void setVisible(Boolean visible) { this.visible = visible; }
     }
 
     /**
      * 菜单信息VO类
      */
+    @Setter
+    @Getter
     public static class MenuInfo {
         private Long id;
         private String name;
@@ -234,41 +163,13 @@ public class UserPermissionCacheService {
             this.children = new ArrayList<>();
         }
 
-        // Getters and Setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-        
-        public String getPath() { return path; }
-        public void setPath(String path) { this.path = path; }
-        
-        public String getComponent() { return component; }
-        public void setComponent(String component) { this.component = component; }
-        
-        public Long getParentId() { return parentId; }
-        public void setParentId(Long parentId) { this.parentId = parentId; }
-        
-        public Integer getSort() { return sort; }
-        public void setSort(Integer sort) { this.sort = sort; }
-        
-        public Boolean getVisible() { return visible; }
-        public void setVisible(Boolean visible) { this.visible = visible; }
-        
-        public String getIcon() { return icon; }
-        public void setIcon(String icon) { this.icon = icon; }
-        
-        public List<MenuInfo> getChildren() { return children; }
-        public void setChildren(List<MenuInfo> children) { this.children = children; }
     }
 
     /**
      * 租户信息VO类
      */
+    @Setter
+    @Getter
     public static class TenantInfo {
         private Long id;
         private String name;
@@ -284,18 +185,6 @@ public class UserPermissionCacheService {
             this.status = tenant.getStatus();
         }
 
-        // Getters and Setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-        
-        public Boolean getStatus() { return status; }
-        public void setStatus(Boolean status) { this.status = status; }
     }
 
     /**
