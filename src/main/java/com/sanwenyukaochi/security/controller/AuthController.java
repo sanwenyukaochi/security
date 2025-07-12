@@ -38,10 +38,6 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
-        System.out.println(loginRequest.getUsername());
-        System.out.println(loginRequest.getPassword());
-        System.out.println(encoder.encode(loginRequest.getPassword()));
         
         Authentication authentication;
         try {
