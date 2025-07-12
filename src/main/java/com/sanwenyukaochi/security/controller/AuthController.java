@@ -60,10 +60,9 @@ public class AuthController {
 
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        List<String> roles = null;
-        /*userDetails.getAuthorities().stream()
+        List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());*/
+                .collect(Collectors.toList());
 
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
                 userDetails.getUsername(), roles, jwtCookie.toString());

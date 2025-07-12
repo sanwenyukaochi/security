@@ -5,6 +5,7 @@ import com.sanwenyukaochi.security.repository.*;
 import com.sanwenyukaochi.security.security.jwt.AuthTokenFilter;
 import com.sanwenyukaochi.security.security.jwt.AuthEntryPointJwt;
 import com.sanwenyukaochi.security.security.service.UserDetailsServiceImpl;
+import com.sanwenyukaochi.security.security.handler.CustomPermissionEvaluator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -34,7 +35,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     
     private final UserDetailsServiceImpl userDetailsServiceImpl;
-
+    private final CustomPermissionEvaluator customPermissionEvaluator;
     private final AuthEntryPointJwt unauthorizedHandler;
     
     @Bean
@@ -58,6 +59,14 @@ public class WebSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler handler = 
+            new org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler();
+        handler.setPermissionEvaluator(customPermissionEvaluator);
+        return handler;
     }
 
     @Bean

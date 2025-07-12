@@ -6,12 +6,14 @@ import java.util.Objects;
 
 import com.sanwenyukaochi.security.entity.Tenant;
 import com.sanwenyukaochi.security.entity.User;
+import com.sanwenyukaochi.security.service.UserPermissionService;
+import com.sanwenyukaochi.security.service.UserPermissionCacheService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -60,11 +62,21 @@ public class UserDetailsImpl implements UserDetails {
 //        this.status = status;
 //    }
     
-    public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = null;
-                /*user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
-                .collect(Collectors.toList());*/
+    public static UserDetailsImpl build(User user, UserPermissionService userPermissionService) {
+        return build(user, userPermissionService, null);
+    }
+
+    public static UserDetailsImpl build(User user, UserPermissionService userPermissionService, UserPermissionCacheService cacheService) {
+        List<String> authorities;
+        if (cacheService != null) {
+            authorities = cacheService.getUserAuthorities(user.getId());
+        } else {
+            authorities = userPermissionService.getUserAuthorities(user.getId());
+        }
+        
+        List<GrantedAuthority> grantedAuthorities = authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(java.util.stream.Collectors.toList());
 
         return new UserDetailsImpl(
                 user.getId(),
@@ -77,7 +89,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getAccountNonExpired(),
                 user.getAccountNonLocked(),
                 user.getCredentialsNonExpired(),
-                authorities);
+                grantedAuthorities);
     }
 
     @Override
@@ -115,14 +127,14 @@ public class UserDetailsImpl implements UserDetails {
         return this.status != null && this.status;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        UserDetailsImpl user = (UserDetailsImpl) o;
-        return Objects.equals(id, user.id);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o)
+//            return true;
+//        if (o == null || getClass() != o.getClass())
+//            return false;
+//        UserDetailsImpl user = (UserDetailsImpl) o;
+//        return Objects.equals(id, user.id);
+//    }
 
 }
