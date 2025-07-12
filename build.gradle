@@ -42,6 +42,9 @@ dependencies {
     }
 
     implementation 'cn.hutool:hutool-all:5.8.24'
+    
+    // User Agent 解析库
+    implementation 'eu.bitwalker:UserAgentUtils:1.21'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

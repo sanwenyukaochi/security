@@ -9,6 +9,9 @@ import com.sanwenyukaochi.security.security.request.SignupRequest;
 import com.sanwenyukaochi.security.security.response.MessageResponse;
 import com.sanwenyukaochi.security.security.response.UserInfoResponse;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
+import com.sanwenyukaochi.security.service.UserPermissionCacheService;
+import eu.bitwalker.useragentutils.UserAgent;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -35,9 +38,10 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
+    private final UserPermissionCacheService userPermissionCacheService;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         
         Authentication authentication;
         try {
@@ -54,6 +58,18 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
+        // 获取用户代理信息
+        String userAgentString = request.getHeader("User-Agent");
+        UserAgent userAgent = UserAgent.parseUserAgentString(userAgentString);
+        
+        // 更新用户登录信息到Redis缓存
+        userPermissionCacheService.updateUserLoginInfo(
+            userDetails.getId(),
+            getClientIpAddress(request),
+            userAgent.getBrowser().getName(),
+            userAgent.getOperatingSystem().getName()
+        );
+
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream()
@@ -66,6 +82,23 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                 jwtCookie.toString())
                 .body(response);
+    }
+
+    /**
+     * 获取客户端IP地址
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp;
+        }
+        
+        return request.getRemoteAddr();
     }
 
     @PostMapping("/signup")
