@@ -1,20 +1,14 @@
-package com.sanwenyukaochi.security.model;
+package com.sanwenyukaochi.security.security.service;
 
-import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.sanwenyukaochi.security.entity.SysTenant;
 import com.sanwenyukaochi.security.entity.User;
-import jakarta.persistence.Column;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 
@@ -73,13 +67,13 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getTenant(),
                 user.getUserName(),
+                user.getPassword(),
                 user.getEmail(),
-                user.getPasswordHash(),
                 user.getPhone(),
+                user.getStatus(),
                 user.getAccountNonExpired(),
                 user.getAccountNonLocked(),
                 user.getCredentialsNonExpired(),
-                user.getStatus(),
                 authorities);
     }
 

@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 
-import com.sanwenyukaochi.security.service.UserDetailsServiceImpl;
+import com.sanwenyukaochi.security.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        logger.debug("AuthTokenFilter called for URI: {}", request.getRequestURI());
+        logger.debug("AuthTokenFilter 调用 URI: {}", request.getRequestURI());
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
@@ -45,14 +45,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,
                                 userDetails.getAuthorities());
-                logger.debug("Roles from JWT: {}", userDetails.getAuthorities());
+                logger.debug("JWT 中的 Roles: {}", userDetails.getAuthorities());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("无法设置用户身份验证：{}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);

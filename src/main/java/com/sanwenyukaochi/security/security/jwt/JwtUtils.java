@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 
-import com.sanwenyukaochi.security.model.UserDetailsImpl;
+import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -91,13 +91,13 @@ public class JwtUtils {
             Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+            logger.error("无效的JWT令牌: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
+            logger.error("JWT令牌已过期: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
+            logger.error("不支持的JWT令牌: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+            logger.error("JWT声明字符串为空: {}", e.getMessage());
         }
         return false;
     }

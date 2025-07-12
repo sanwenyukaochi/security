@@ -6,16 +6,16 @@ import com.sanwenyukaochi.security.repository.SysTenantRepository;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.security.jwt.AuthTokenFilter;
 import com.sanwenyukaochi.security.security.jwt.AuthEntryPointJwt;
-import com.sanwenyukaochi.security.service.UserDetailsServiceImpl;
+import com.sanwenyukaochi.security.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,14 +24,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Set;
-
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -71,29 +69,33 @@ public class WebSecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
         http.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/v1/users/userLogin",
-                                "/api/v1/users/userRegister",
-                                "/api/v1/users/rsaPublicKey",
-                                "/api/v1/videos/clipVideoCallBack",
-                                "/api/v1/videos/tagVideoCallBack"
-                        ).permitAll()
-                );
+        http.authorizeHttpRequests(
+                auth -> auth.requestMatchers(
+                    "/api/auth/**"
+                ).permitAll()
+        );
+        http.authorizeHttpRequests(
+                auth -> auth
+            .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/swagger-resources/**",
+                    "/webjars/**"
+            ).access((authentication, context) -> {
+                String ip = context.getRequest().getRemoteAddr();
+                boolean isLocalhost = "127.0.0.1".equals(ip) || "::1".equals(ip);
+                log.debug("Access attempt from IP: {}, isLocalhost: {}", ip, isLocalhost);
+                return new AuthorizationDecision(isLocalhost);
+            })
+            .anyRequest().authenticated()
+        );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         return http.build();
     }
 
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web -> web.ignoring().requestMatchers("/v2/api-docs",
-//                "/configuration/ui",
-//                "/swagger-resources/**",
-//                "/configuration/security",
-//                "/swagger-ui.html",
-//                "/webjars/**"));
-//    }
 
     @Bean
     public CommandLineRunner initData(SysTenantRepository sysTenantRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -115,7 +117,7 @@ public class WebSecurityConfig {
                 user1.setTenantId(1L);
                 user1.setTenant(sysTenantRepository.findById(1L).orElseThrow());
                 user1.setUserName("user1");
-                user1.setPasswordHash(passwordEncoder.encode("123456"));
+                user1.setPassword(passwordEncoder.encode("123456"));
                 user1.setEmail("");
                 user1.setPhone("");
                 

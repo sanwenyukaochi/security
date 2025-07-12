@@ -1,7 +1,6 @@
-package com.sanwenyukaochi.security.service;
+package com.sanwenyukaochi.security.security.service;
 
 import com.sanwenyukaochi.security.entity.User;
-import com.sanwenyukaochi.security.model.UserDetailsImpl;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

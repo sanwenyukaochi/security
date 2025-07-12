@@ -1,6 +1,8 @@
 package com.sanwenyukaochi.security.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,7 +30,9 @@ public class User extends BaseEntity{
 
     @Column(name = "password_hash", nullable = false)
     @Comment("用户密码")
-    private String passwordHash;
+    @NotBlank
+    @Size(max = 120)
+    private String password;
 
     @Column(name = "email", length = 100, nullable = false)
     @Comment("邮箱")
@@ -54,4 +58,9 @@ public class User extends BaseEntity{
     @Comment("密码是否未过期（true=有效，false=已过期）")
     private Boolean credentialsNonExpired = true;
 
+    public User(String userName, String email, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+    }
 }
