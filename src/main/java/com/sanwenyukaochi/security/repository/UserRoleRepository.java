@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
@@ -27,4 +28,6 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     Boolean existsByUserAndRole(User user, Role role);
     
     Boolean existsByUser_IdAndRole_Id(Long userId, Long roleId);
-} 
+
+    Optional<UserRole> findByUser_IdAndRole_Id(Long userId, Long roleId);
+}

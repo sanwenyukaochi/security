@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RolePermissionRepository extends JpaRepository<RolePermission, Long> {
@@ -27,4 +28,6 @@ public interface RolePermissionRepository extends JpaRepository<RolePermission, 
     Boolean existsByRoleAndPermission(Role role, Permission permission);
     
     Boolean existsByRole_IdAndPermission_Id(Long roleId, Long permissionId);
+
+    Optional<RolePermission> findByRole_IdAndPermission_Id(Long id, Long id1);
 } 

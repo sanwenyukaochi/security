@@ -2,10 +2,10 @@ package com.sanwenyukaochi.security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableRedisRepositories
+@EnableJpaRepositories(basePackages = "com.sanwenyukaochi.security.repository")
 public class SecurityApplication {
 
     public static void main(String[] args) {

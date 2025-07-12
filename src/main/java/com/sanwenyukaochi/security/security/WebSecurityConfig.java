@@ -30,9 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Collections;
-import java.util.Optional;
-
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -106,22 +103,19 @@ public class WebSecurityConfig {
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         return http.build();
     }
-
-    
-    private final TenantRepository tenantRepository;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PermissionRepository permissionRepository;
-    private final UserRoleRepository userRoleRepository;
-    private final RolePermissionRepository rolePermissionRepository;
-    private final PasswordEncoder passwordEncoder;
     
     @Bean
-    // @Profile({"staging"})
-    public CommandLineRunner initData() {
+    @Profile({"dev"})
+    public CommandLineRunner initData(TenantRepository tenantRepository, 
+                                      UserRepository userRepository, 
+                                      RoleRepository roleRepository,
+                                      PermissionRepository permissionRepository,
+                                      UserRoleRepository userRoleRepository,
+                                      RolePermissionRepository rolePermissionRepository,
+                                      PasswordEncoder passwordEncoder) {
         return args -> {
-            
-            Optional<Tenant> tenant = Optional.ofNullable(tenantRepository.findByName("测试组"))
+
+            Tenant tenant = tenantRepository.findByName("测试组")
                     .orElseGet(() -> {
                         Tenant newTenant = new Tenant();
                         newTenant.setId(snowflake.nextId());
@@ -130,15 +124,15 @@ public class WebSecurityConfig {
                         newTenant.setStatus(true);
                         newTenant.setCreatedBy(1L);
                         newTenant.setUpdatedBy(1L);
-                        return Optional.of(tenantRepository.save(newTenant));
+                        return tenantRepository.save(newTenant);
                     });
-            
-            Optional<User> userAdmin = Optional.ofNullable(userRepository.findByUserName("admin"))
+
+            User userAdmin = userRepository.findByUserName("admin")
                     .orElseGet(() -> {
                         User newUser = new User();
                         newUser.setId(snowflake.nextId());
-                        newUser.setTenant(tenant.orElseThrow());
-                        newUser.setTenantId(tenant.orElseThrow().getId());
+                        newUser.setTenant(tenant);
+                        newUser.setTenantId(tenant.getId());
                         newUser.setUserName("admin");
                         newUser.setPassword(passwordEncoder.encode("123456"));
                         newUser.setEmail("admin@example.com");
@@ -149,16 +143,15 @@ public class WebSecurityConfig {
                         newUser.setCredentialsNonExpired(true);
                         newUser.setCreatedBy(1L);
                         newUser.setUpdatedBy(1L);
-                        return Optional.of(userRepository.save(newUser));
-                    }
-            );
+                        return userRepository.save(newUser);
+                    });
 
-            Optional<User> userTenant = Optional.ofNullable(userRepository.findByUserName("tenant"))
+            User userTenant = userRepository.findByUserName("tenant")
                     .orElseGet(() -> {
                         User newUser = new User();
                         newUser.setId(snowflake.nextId());
-                        newUser.setTenant(tenant.orElseThrow());
-                        newUser.setTenantId(tenant.orElseThrow().getId());
+                        newUser.setTenant(tenant);
+                        newUser.setTenantId(tenant.getId());
                         newUser.setUserName("tenant");
                         newUser.setPassword(passwordEncoder.encode("123456"));
                         newUser.setEmail("tenant@example.com");
@@ -169,19 +162,18 @@ public class WebSecurityConfig {
                         newUser.setCredentialsNonExpired(true);
                         newUser.setCreatedBy(1L);
                         newUser.setUpdatedBy(1L);
-                        return Optional.of(userRepository.save(newUser));
-                    }
-            );
+                        return userRepository.save(newUser);
+                    });
 
-            Optional<User> userUser = Optional.ofNullable(userRepository.findByUserName("user"))
+            User userUser = userRepository.findByUserName("user")
                     .orElseGet(() -> {
                         User newUser = new User();
                         newUser.setId(snowflake.nextId());
-                        newUser.setTenant(tenant.orElseThrow());
-                        newUser.setTenantId(tenant.orElseThrow().getId());
-                        newUser.setUserName("userUser");
+                        newUser.setTenant(tenant);
+                        newUser.setTenantId(tenant.getId());
+                        newUser.setUserName("user");
                         newUser.setPassword(passwordEncoder.encode("123456"));
-                        newUser.setEmail("userUser@example.com");
+                        newUser.setEmail("user@example.com");
                         newUser.setPhone("13800138003");
                         newUser.setStatus(true);
                         newUser.setAccountNonExpired(true);
@@ -189,307 +181,200 @@ public class WebSecurityConfig {
                         newUser.setCredentialsNonExpired(true);
                         newUser.setCreatedBy(1L);
                         newUser.setUpdatedBy(1L);
-                        return Optional.of(userRepository.save(newUser));
-                    }
-            );
+                        return userRepository.save(newUser);
+                    });
 
-
-            Optional<Role> roleAdmin = Optional.ofNullable(roleRepository.findByCode("admin"))
+            Role roleAdmin = roleRepository.findByCode("admin")
                     .orElseGet(() -> {
-                                Role newRole = new Role();
-                                newRole.setId(snowflake.nextId());
-                                newRole = new Role();
-                                newRole.setId(snowflake.nextId());
-                                newRole.setTenant(tenant.orElseThrow());
-                                newRole.setTenantId(tenant.orElseThrow().getId());
-                                newRole.setName("系统管理员");
-                                newRole.setCode("admin");
-                                newRole.setDataScope(0);
-                                newRole.setStatus(true);
-                                newRole.setCreatedBy(1L);
-                                newRole.setUpdatedBy(1L);
-                                return Optional.of(roleRepository.save(newRole));
-                            }
-                    );
+                        Role newRole = new Role();
+                        newRole.setId(snowflake.nextId());
+                        newRole.setTenant(tenant);
+                        newRole.setTenantId(tenant.getId());
+                        newRole.setName("系统管理员");
+                        newRole.setCode("admin");
+                        newRole.setDataScope(0);
+                        newRole.setStatus(true);
+                        newRole.setCreatedBy(1L);
+                        newRole.setUpdatedBy(1L);
+                        return roleRepository.save(newRole);
+                    });
 
-
-            Optional<Role> roleTenant = Optional.ofNullable(roleRepository.findByCode("tenant"))
+            Role roleTenant = roleRepository.findByCode("tenant")
                     .orElseGet(() -> {
-                                Role newRole = new Role();
-                                newRole.setId(snowflake.nextId());
-                                newRole = new Role();
-                                newRole.setId(snowflake.nextId());
-                                newRole.setTenant(tenant.orElseThrow());
-                                newRole.setTenantId(tenant.orElseThrow().getId());
-                                newRole.setName("租户管理员");
-                                newRole.setCode("tenant");
-                                newRole.setDataScope(1);
-                                newRole.setStatus(true);
-                                newRole.setCreatedBy(1L);
-                                newRole.setUpdatedBy(1L);
-                                return Optional.of(roleRepository.save(newRole));
-                            }
-                    );
-            
-//            Permission userManagePermission = null;
-//            Permission userViewPermission = null;
-//            Permission userAddPermission = null;
-//            Permission userEditPermission = null;
-//            Permission userDeletePermission = null;
-//            
-//            if (!permissionRepository.existsByCode("user:manage")) {
-//                userManagePermission = new Permission();
-//                userManagePermission.setId(1L);
-//                userManagePermission.setTenantId(tenant.getId());
-//                userManagePermission.setParentId(0L);
-//                userManagePermission.setType("1"); // 菜单
-//                userManagePermission.setName("用户管理");
-//                userManagePermission.setCode("user:manage");
-//                userManagePermission.setPath("/user");
-//                userManagePermission.setSort(1);
-//                userManagePermission.setVisible(true);
-//                userManagePermission.setCreatedBy(1L);
-//                userManagePermission.setUpdatedBy(1L);
-//                userManagePermission = permissionRepository.save(userManagePermission);
-//            } else {
-//                userManagePermission = permissionRepository.findByCode("user:manage").orElseThrow();
-//            }
-//            
-//            if (!permissionRepository.existsByCode("user:view")) {
-//                userViewPermission = new Permission();
-//                userViewPermission.setId(2L);
-//                userViewPermission.setTenantId(tenant.getId());
-//                userViewPermission.setParentId(1L);
-//                userViewPermission.setType("2"); // 按钮
-//                userViewPermission.setName("用户查看");
-//                userViewPermission.setCode("user:view");
-//                userViewPermission.setPath("/user/view");
-//                userViewPermission.setSort(1);
-//                userViewPermission.setVisible(true);
-//                userViewPermission.setCreatedBy(1L);
-//                userViewPermission.setUpdatedBy(1L);
-//                userViewPermission = permissionRepository.save(userViewPermission);
-//            } else {
-//                userViewPermission = permissionRepository.findByCode("user:view").orElseThrow();
-//            }
-//            
-//            if (!permissionRepository.existsByCode("user:add")) {
-//                userAddPermission = new Permission();
-//                userAddPermission.setId(3L);
-//                userAddPermission.setTenantId(tenant.getId());
-//                userAddPermission.setParentId(1L);
-//                userAddPermission.setType("2"); // 按钮
-//                userAddPermission.setName("用户新增");
-//                userAddPermission.setCode("user:add");
-//                userAddPermission.setPath("/user/add");
-//                userAddPermission.setSort(2);
-//                userAddPermission.setVisible(true);
-//                userAddPermission.setCreatedBy(1L);
-//                userAddPermission.setUpdatedBy(1L);
-//                userAddPermission = permissionRepository.save(userAddPermission);
-//            } else {
-//                userAddPermission = permissionRepository.findByCode("user:add").orElseThrow();
-//            }
-//            
-//            if (!permissionRepository.existsByCode("user:edit")) {
-//                userEditPermission = new Permission();
-//                userEditPermission.setId(4L);
-//                userEditPermission.setTenantId(tenant.getId());
-//                userEditPermission.setParentId(1L);
-//                userEditPermission.setType("2"); // 按钮
-//                userEditPermission.setName("用户编辑");
-//                userEditPermission.setCode("user:edit");
-//                userEditPermission.setPath("/user/edit");
-//                userEditPermission.setSort(3);
-//                userEditPermission.setVisible(true);
-//                userEditPermission.setCreatedBy(1L);
-//                userEditPermission.setUpdatedBy(1L);
-//                userEditPermission = permissionRepository.save(userEditPermission);
-//            } else {
-//                userEditPermission = permissionRepository.findByCode("user:edit").orElseThrow();
-//            }
-//            
-//            if (!permissionRepository.existsByCode("user:delete")) {
-//                userDeletePermission = new Permission();
-//                userDeletePermission.setId(5L);
-//                userDeletePermission.setTenantId(tenant.getId());
-//                userDeletePermission.setParentId(1L);
-//                userDeletePermission.setType("2"); // 按钮
-//                userDeletePermission.setName("用户删除");
-//                userDeletePermission.setCode("user:delete");
-//                userDeletePermission.setPath("/user/delete");
-//                userDeletePermission.setSort(4);
-//                userDeletePermission.setVisible(true);
-//                userDeletePermission.setCreatedBy(1L);
-//                userDeletePermission.setUpdatedBy(1L);
-//                userDeletePermission = permissionRepository.save(userDeletePermission);
-//            } else {
-//                userDeletePermission = permissionRepository.findByCode("user:delete").orElseThrow();
-//            }
-//            
-//            // 4. 创建用户
-//            User adminUser = null;
-//            User normalUser = null;
-//            User guestUser = null;
-//            
-//
-//            
-//
-//            
-//            // 5. 分配用户角色
-//            if (!userRoleRepository.existsByUser_IdAndRole_Id(adminUser.getId(), adminRole.getId())) {
-//                UserRole adminUserRole = new UserRole();
-//                adminUserRole.setId(1L);
-//                adminUserRole.setTenantId(tenant.getId());
-//                adminUserRole.setUser(adminUser);
-//                adminUserRole.setRole(adminRole);
-//                userRoleRepository.save(adminUserRole);
-//            }
-//            
-//            if (!userRoleRepository.existsByUser_IdAndRole_Id(normalUser.getId(), userRole.getId())) {
-//                UserRole normalUserRole = new UserRole();
-//                normalUserRole.setId(2L);
-//                normalUserRole.setTenantId(tenant.getId());
-//                normalUserRole.setUser(normalUser);
-//                normalUserRole.setRole(userRole);
-//                userRoleRepository.save(normalUserRole);
-//            }
-//            
-//            if (!userRoleRepository.existsByUser_IdAndRole_Id(guestUser.getId(), guestRole.getId())) {
-//                UserRole guestUserRole = new UserRole();
-//                guestUserRole.setId(3L);
-//                guestUserRole.setTenantId(tenant.getId());
-//                guestUserRole.setUser(guestUser);
-//                guestUserRole.setRole(guestRole);
-//                userRoleRepository.save(guestUserRole);
-//            }
-//            
-//            // 6. 分配角色权限
-//            // 管理员拥有所有权限
-//            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userManagePermission.getId())) {
-//                RolePermission adminUserManage = new RolePermission();
-//                adminUserManage.setId(1L);
-//                adminUserManage.setTenantId(tenant.getId());
-//                adminUserManage.setRole(adminRole);
-//                adminUserManage.setPermission(userManagePermission);
-//                rolePermissionRepository.save(adminUserManage);
-//            }
-//            
-//            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userViewPermission.getId())) {
-//                RolePermission adminUserView = new RolePermission();
-//                adminUserView.setId(2L);
-//                adminUserView.setTenantId(tenant.getId());
-//                adminUserView.setRole(adminRole);
-//                adminUserView.setPermission(userViewPermission);
-//                rolePermissionRepository.save(adminUserView);
-//            }
-//            
-//            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userAddPermission.getId())) {
-//                RolePermission adminUserAdd = new RolePermission();
-//                adminUserAdd.setId(3L);
-//                adminUserAdd.setTenantId(tenant.getId());
-//                adminUserAdd.setRole(adminRole);
-//                adminUserAdd.setPermission(userAddPermission);
-//                rolePermissionRepository.save(adminUserAdd);
-//            }
-//            
-//            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userEditPermission.getId())) {
-//                RolePermission adminUserEdit = new RolePermission();
-//                adminUserEdit.setId(4L);
-//                adminUserEdit.setTenantId(tenant.getId());
-//                adminUserEdit.setRole(adminRole);
-//                adminUserEdit.setPermission(userEditPermission);
-//                rolePermissionRepository.save(adminUserEdit);
-//            }
-//            
-//            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userDeletePermission.getId())) {
-//                RolePermission adminUserDelete = new RolePermission();
-//                adminUserDelete.setId(5L);
-//                adminUserDelete.setTenantId(tenant.getId());
-//                adminUserDelete.setRole(adminRole);
-//                adminUserDelete.setPermission(userDeletePermission);
-//                rolePermissionRepository.save(adminUserDelete);
-//            }
-//            
-//            // 普通用户只有查看权限
-//            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(userRole.getId(), userViewPermission.getId())) {
-//                RolePermission normalUserView = new RolePermission();
-//                normalUserView.setId(6L);
-//                normalUserView.setTenantId(tenant.getId());
-//                normalUserView.setRole(userRole);
-//                normalUserView.setPermission(userViewPermission);
-//                rolePermissionRepository.save(normalUserView);
-//            }
-            
-            // 访客没有任何权限
-            log.info("RBAC初始化完成！");
-            log.info("测试用户：");
-            log.info("管理员 - 用户名: admin, 密码: 123456");
-            log.info("普通用户 - 用户名: user, 密码: 123456");
-            log.info("访客 - 用户名: guest, 密码: 123456");
+                        Role newRole = new Role();
+                        newRole.setId(snowflake.nextId());
+                        newRole.setTenant(tenant);
+                        newRole.setTenantId(tenant.getId());
+                        newRole.setName("租户管理员");
+                        newRole.setCode("tenant");
+                        newRole.setDataScope(1);
+                        newRole.setStatus(true);
+                        newRole.setCreatedBy(1L);
+                        newRole.setUpdatedBy(1L);
+                        return roleRepository.save(newRole);
+                    });
+
+            Role roleUser = roleRepository.findByCode("user")
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setId(snowflake.nextId());
+                        newRole.setTenant(tenant);
+                        newRole.setTenantId(tenant.getId());
+                        newRole.setName("普通用户");
+                        newRole.setCode("user");
+                        newRole.setDataScope(2);
+                        newRole.setStatus(true);
+                        newRole.setCreatedBy(1L);
+                        newRole.setUpdatedBy(1L);
+                        return roleRepository.save(newRole);
+                    });
+
+            Permission userManagePermission = permissionRepository.findByCode("user:manage")
+                    .orElseGet(() -> {
+                        Permission newPermission = new Permission();
+                        newPermission.setId(snowflake.nextId());
+                        newPermission.setTenantId(tenant.getId());
+                        newPermission.setParentId(0L);
+                        newPermission.setType("1"); // 菜单
+                        newPermission.setName("用户管理");
+                        newPermission.setCode("user:manage");
+                        newPermission.setPath("/user");
+                        newPermission.setSort(1);
+                        newPermission.setVisible(true);
+                        newPermission.setCreatedBy(1L);
+                        newPermission.setUpdatedBy(1L);
+                        return permissionRepository.save(newPermission);
+                    });
+
+            Permission userViewPermission = permissionRepository.findByCode("user:view")
+                    .orElseGet(() -> {
+                        Permission newPermission = new Permission();
+                        newPermission.setId(snowflake.nextId());
+                        newPermission.setTenantId(tenant.getId());
+                        newPermission.setParentId(userManagePermission.getId());
+                        newPermission.setType("2"); // 按钮
+                        newPermission.setName("用户查看");
+                        newPermission.setCode("user:view");
+                        newPermission.setPath("/user/view");
+                        newPermission.setSort(1);
+                        newPermission.setVisible(true);
+                        newPermission.setCreatedBy(1L);
+                        newPermission.setUpdatedBy(1L);
+                        return permissionRepository.save(newPermission);
+                    });
+
+            Permission userAddPermission = permissionRepository.findByCode("user:add")
+                    .orElseGet(() -> {
+                        Permission newPermission = new Permission();
+                        newPermission.setId(snowflake.nextId());
+                        newPermission.setTenantId(tenant.getId());
+                        newPermission.setParentId(userManagePermission.getId());
+                        newPermission.setType("2"); // 按钮
+                        newPermission.setName("用户新增");
+                        newPermission.setCode("user:add");
+                        newPermission.setPath("/user/add");
+                        newPermission.setSort(2);
+                        newPermission.setVisible(true);
+                        newPermission.setCreatedBy(1L);
+                        newPermission.setUpdatedBy(1L);
+                        return permissionRepository.save(newPermission);
+                    });
+
+            Permission userEditPermission = permissionRepository.findByCode("user:edit")
+                    .orElseGet(() -> {
+                        Permission newPermission = new Permission();
+                        newPermission.setId(snowflake.nextId());
+                        newPermission.setTenantId(tenant.getId());
+                        newPermission.setParentId(userManagePermission.getId());
+                        newPermission.setType("2"); // 按钮
+                        newPermission.setName("用户编辑");
+                        newPermission.setCode("user:edit");
+                        newPermission.setPath("/user/edit");
+                        newPermission.setSort(3);
+                        newPermission.setVisible(true);
+                        newPermission.setCreatedBy(1L);
+                        newPermission.setUpdatedBy(1L);
+                        return permissionRepository.save(newPermission);
+                    });
+
+            Permission userDeletePermission = permissionRepository.findByCode("user:delete")
+                    .orElseGet(() -> {
+                        Permission newPermission = new Permission();
+                        newPermission.setId(snowflake.nextId());
+                        newPermission.setTenantId(tenant.getId());
+                        newPermission.setParentId(userManagePermission.getId());
+                        newPermission.setType("2"); // 按钮
+                        newPermission.setName("用户删除");
+                        newPermission.setCode("user:delete");
+                        newPermission.setPath("/user/delete");
+                        newPermission.setSort(4);
+                        newPermission.setVisible(true);
+                        newPermission.setCreatedBy(1L);
+                        newPermission.setUpdatedBy(1L);
+                        return permissionRepository.save(newPermission);
+                    });
+
+            bindUserAndRole(userRoleRepository, tenant, userAdmin, roleAdmin);
+            bindUserAndRole(userRoleRepository, tenant, userTenant, roleTenant);
+            bindUserAndRole(userRoleRepository, tenant, userUser, roleUser);
+
+            bindRoleAndPermission(rolePermissionRepository, roleAdmin, userManagePermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleAdmin, userViewPermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleAdmin, userAddPermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleAdmin, userEditPermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleAdmin, userDeletePermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleTenant, userViewPermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleTenant, userEditPermission, tenant);
+            bindRoleAndPermission(rolePermissionRepository, roleUser, userViewPermission, tenant);
+
+            // 初始化完成
+            log.info("=== RBAC权限系统初始化完成 ===");
+            log.info("🗃️ 数据统计:");
+            log.info("   ├─ 租户: {} (ID: {})", tenant.getName(), tenant.getId());
+            log.info("   ├─ 用户: {} 个", 3);
+            log.info("   ├─ 角色: {} 个", 3);
+            log.info("   └─ 权限: {} 个", 5);
+            log.info("");
+            log.info("📒 用户信息:");
+            log.info("   ├─ 系统管理员: {} (角色: {})", userAdmin.getUserName(), roleAdmin.getName());
+            log.info("   ├─ 租户管理员: {} (角色: {})", userTenant.getUserName(), roleTenant.getName());
+            log.info("   └─ 普通用户: {} (角色: {})", userUser.getUserName(), roleUser.getName());
+            log.info("");
+            log.info("🔐 权限分配:");
+            log.info("   ├─ {}: 拥有所有权限 (管理/查看/新增/编辑/删除)", roleAdmin.getName());
+            log.info("   ├─ {}: 拥有查看和编辑权限", roleTenant.getName());
+            log.info("   └─ {}: 只有查看权限", roleUser.getName());
+            log.info("");
+            log.info("🔑 测试账号 (密码均为: 123456):");
+            log.info("   ├─ 系统管理员: admin");
+            log.info("   ├─ 租户管理员: tenant");
+            log.info("   └─ 普通用户: user");
+            log.info("=== 初始化完成 ===");
         };
     }
-    
-    /*
-    @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return args -> {
-            // Retrieve or create roles
-            Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
-                    .orElseGet(() -> {
-                        Role newUserRole = new Role(AppRole.ROLE_USER);
-                        return roleRepository.save(newUserRole);
-                    });
 
-            Role sellerRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER)
-                    .orElseGet(() -> {
-                        Role newSellerRole = new Role(AppRole.ROLE_SELLER);
-                        return roleRepository.save(newSellerRole);
-                    });
+    private void bindRoleAndPermission(RolePermissionRepository rolePermissionRepository, Role role, Permission Permission, Tenant tenant) {
+        rolePermissionRepository.findByRole_IdAndPermission_Id(role.getId(), Permission.getId())
+                .orElseGet(() -> {
+                    RolePermission newRolePermission = new RolePermission();
+                    newRolePermission.setId(snowflake.nextId());
+                    newRolePermission.setTenantId(tenant.getId());
+                    newRolePermission.setRole(role);
+                    newRolePermission.setPermission(Permission);
+                    return rolePermissionRepository.save(newRolePermission);
+                });
+    }
 
-            Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-                    .orElseGet(() -> {
-                        Role newAdminRole = new Role(AppRole.ROLE_ADMIN);
-                        return roleRepository.save(newAdminRole);
-                    });
+    private void bindUserAndRole(UserRoleRepository userRoleRepository, Tenant tenant, User user, Role role) {
+        userRoleRepository.findByUser_IdAndRole_Id(user.getId(), role.getId())
+                .orElseGet(() -> {
+                    UserRole newUserRole = new UserRole();
+                    newUserRole.setId(snowflake.nextId());
+                    newUserRole.setTenantId(tenant.getId());
+                    newUserRole.setUser(user);
+                    newUserRole.setRole(role);
+                    return userRoleRepository.save(newUserRole);
+                });
+    }
 
-            Set<Role> userRoles = Set.of(userRole);
-            Set<Role> sellerRoles = Set.of(sellerRole);
-            Set<Role> adminRoles = Set.of(userRole, sellerRole, adminRole);
-
-
-            // Create users if not already present
-            if (!userRepository.existsByUserName("user1")) {
-                User user1 = new User("user1", "user1@example.com", passwordEncoder.encode("password1"));
-                userRepository.save(user1);
-            }
-
-            if (!userRepository.existsByUserName("seller1")) {
-                User seller1 = new User("seller1", "seller1@example.com", passwordEncoder.encode("password2"));
-                userRepository.save(seller1);
-            }
-
-            if (!userRepository.existsByUserName("admin")) {
-                User admin = new User("admin", "admin@example.com", passwordEncoder.encode("adminPass"));
-                userRepository.save(admin);
-            }
-
-            // Update roles for existing users
-            userRepository.findByUserName("user1").ifPresent(user -> {
-                user.setRoles(userRoles);
-                userRepository.save(user);
-            });
-
-            userRepository.findByUserName("seller1").ifPresent(seller -> {
-                seller.setRoles(sellerRoles);
-                userRepository.save(seller);
-            });
-
-            userRepository.findByUserName("admin").ifPresent(admin -> {
-                admin.setRoles(adminRoles);
-                userRepository.save(admin);
-            });
-        };
-    }*/
-    
 }
