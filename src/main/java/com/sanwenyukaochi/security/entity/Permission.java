@@ -5,6 +5,10 @@ import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
@@ -42,4 +46,8 @@ public class Permission  extends BaseEntity {
     @Comment("是否可见（true可见，false隐藏）")
     private Boolean visible;
 
+    // 权限角色关联
+    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<RolePermission> rolePermissions = new ArrayList<>();
 }

@@ -344,87 +344,87 @@ public class WebSecurityConfig {
             }
             
             // 5. 分配用户角色
-            if (!userRoleRepository.existsByUserIdAndRoleId(adminUser.getId(), adminRole.getId())) {
+            if (!userRoleRepository.existsByUser_IdAndRole_Id(adminUser.getId(), adminRole.getId())) {
                 UserRole adminUserRole = new UserRole();
                 adminUserRole.setId(1L);
                 adminUserRole.setTenantId(tenant.getId());
-                adminUserRole.setUserId(adminUser.getId());
-                adminUserRole.setRoleId(adminRole.getId());
+                adminUserRole.setUser(adminUser);
+                adminUserRole.setRole(adminRole);
                 userRoleRepository.save(adminUserRole);
             }
             
-            if (!userRoleRepository.existsByUserIdAndRoleId(normalUser.getId(), userRole.getId())) {
+            if (!userRoleRepository.existsByUser_IdAndRole_Id(normalUser.getId(), userRole.getId())) {
                 UserRole normalUserRole = new UserRole();
                 normalUserRole.setId(2L);
                 normalUserRole.setTenantId(tenant.getId());
-                normalUserRole.setUserId(normalUser.getId());
-                normalUserRole.setRoleId(userRole.getId());
+                normalUserRole.setUser(normalUser);
+                normalUserRole.setRole(userRole);
                 userRoleRepository.save(normalUserRole);
             }
             
-            if (!userRoleRepository.existsByUserIdAndRoleId(guestUser.getId(), guestRole.getId())) {
+            if (!userRoleRepository.existsByUser_IdAndRole_Id(guestUser.getId(), guestRole.getId())) {
                 UserRole guestUserRole = new UserRole();
                 guestUserRole.setId(3L);
                 guestUserRole.setTenantId(tenant.getId());
-                guestUserRole.setUserId(guestUser.getId());
-                guestUserRole.setRoleId(guestRole.getId());
+                guestUserRole.setUser(guestUser);
+                guestUserRole.setRole(guestRole);
                 userRoleRepository.save(guestUserRole);
             }
             
             // 6. 分配角色权限
             // 管理员拥有所有权限
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(adminRole.getId(), userManagePermission.getId())) {
+            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userManagePermission.getId())) {
                 RolePermission adminUserManage = new RolePermission();
                 adminUserManage.setId(1L);
                 adminUserManage.setTenantId(tenant.getId());
-                adminUserManage.setRoleId(adminRole.getId());
-                adminUserManage.setPermissionId(userManagePermission.getId());
+                adminUserManage.setRole(adminRole);
+                adminUserManage.setPermission(userManagePermission);
                 rolePermissionRepository.save(adminUserManage);
             }
             
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(adminRole.getId(), userViewPermission.getId())) {
+            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userViewPermission.getId())) {
                 RolePermission adminUserView = new RolePermission();
                 adminUserView.setId(2L);
                 adminUserView.setTenantId(tenant.getId());
-                adminUserView.setRoleId(adminRole.getId());
-                adminUserView.setPermissionId(userViewPermission.getId());
+                adminUserView.setRole(adminRole);
+                adminUserView.setPermission(userViewPermission);
                 rolePermissionRepository.save(adminUserView);
             }
             
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(adminRole.getId(), userAddPermission.getId())) {
+            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userAddPermission.getId())) {
                 RolePermission adminUserAdd = new RolePermission();
                 adminUserAdd.setId(3L);
                 adminUserAdd.setTenantId(tenant.getId());
-                adminUserAdd.setRoleId(adminRole.getId());
-                adminUserAdd.setPermissionId(userAddPermission.getId());
+                adminUserAdd.setRole(adminRole);
+                adminUserAdd.setPermission(userAddPermission);
                 rolePermissionRepository.save(adminUserAdd);
             }
             
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(adminRole.getId(), userEditPermission.getId())) {
+            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userEditPermission.getId())) {
                 RolePermission adminUserEdit = new RolePermission();
                 adminUserEdit.setId(4L);
                 adminUserEdit.setTenantId(tenant.getId());
-                adminUserEdit.setRoleId(adminRole.getId());
-                adminUserEdit.setPermissionId(userEditPermission.getId());
+                adminUserEdit.setRole(adminRole);
+                adminUserEdit.setPermission(userEditPermission);
                 rolePermissionRepository.save(adminUserEdit);
             }
             
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(adminRole.getId(), userDeletePermission.getId())) {
+            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(adminRole.getId(), userDeletePermission.getId())) {
                 RolePermission adminUserDelete = new RolePermission();
                 adminUserDelete.setId(5L);
                 adminUserDelete.setTenantId(tenant.getId());
-                adminUserDelete.setRoleId(adminRole.getId());
-                adminUserDelete.setPermissionId(userDeletePermission.getId());
+                adminUserDelete.setRole(adminRole);
+                adminUserDelete.setPermission(userDeletePermission);
                 rolePermissionRepository.save(adminUserDelete);
             }
             
             // 普通用户只有查看权限
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(userRole.getId(), userViewPermission.getId())) {
+            if (!rolePermissionRepository.existsByRole_IdAndPermission_Id(userRole.getId(), userViewPermission.getId())) {
                 RolePermission normalUserView = new RolePermission();
                 normalUserView.setId(6L);
                 normalUserView.setTenantId(tenant.getId());
-                normalUserView.setRoleId(userRole.getId());
-                normalUserView.setPermissionId(userViewPermission.getId());
+                normalUserView.setRole(userRole);
+                normalUserView.setPermission(userViewPermission);
                 rolePermissionRepository.save(normalUserView);
             }
             

@@ -4,12 +4,14 @@ import com.sanwenyukaochi.security.entity.*;
 import com.sanwenyukaochi.security.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserPermissionService {
 
     private final UserRoleRepository userRoleRepository;
@@ -21,11 +23,9 @@ public class UserPermissionService {
      * 获取用户的所有角色代码
      */
     public List<String> getUserRoleCodes(Long userId) {
-        List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
+        List<UserRole> userRoles = userRoleRepository.findByUser_Id(userId);
         return userRoles.stream()
-                .map(userRole -> roleRepository.findById(userRole.getRoleId()))
-                .filter(java.util.Optional::isPresent)
-                .map(java.util.Optional::get)
+                .map(UserRole::getRole)
                 .map(Role::getCode)
                 .collect(Collectors.toList());
     }
@@ -34,14 +34,13 @@ public class UserPermissionService {
      * 获取用户的所有权限代码
      */
     public List<String> getUserPermissionCodes(Long userId) {
-        List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
+        List<UserRole> userRoles = userRoleRepository.findByUser_Id(userId);
         
         return userRoles.stream()
-                .map(userRole -> rolePermissionRepository.findByRoleId(userRole.getRoleId()))
+                .map(UserRole::getRole)
+                .map(role -> rolePermissionRepository.findByRole(role))
                 .flatMap(List::stream)
-                .map(rolePermission -> permissionRepository.findById(rolePermission.getPermissionId()))
-                .filter(java.util.Optional::isPresent)
-                .map(java.util.Optional::get)
+                .map(RolePermission::getPermission)
                 .map(Permission::getCode)
                 .distinct()
                 .collect(Collectors.toList());

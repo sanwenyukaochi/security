@@ -5,6 +5,12 @@ import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
@@ -34,4 +40,14 @@ public class Role extends BaseEntity {
     @Column(name = "status", nullable = false)
     @Comment("状态（false禁用，true启用）")
     private Boolean status = false;
+
+    // 角色用户关联
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<UserRole> userRoles = new ArrayList<>();
+
+    // 角色权限关联
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<RolePermission> rolePermissions = new HashSet<>();
 }

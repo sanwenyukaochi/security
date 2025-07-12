@@ -111,16 +111,26 @@ public class PermissionController {
         }
 
         // 检查是否已经分配了该角色
-        if (userRoleRepository.existsByUserIdAndRoleId(userId, roleId)) {
+        if (userRoleRepository.existsByUser_IdAndRole_Id(userId, roleId)) {
             response.put("message", "用户已经拥有该角色");
+            response.put("status", "error");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 获取用户和角色实体
+        User user = userRepository.findById(userId).orElse(null);
+        Role role = roleRepository.findById(roleId).orElse(null);
+        
+        if (user == null || role == null) {
+            response.put("message", "用户或角色不存在");
             response.put("status", "error");
             return ResponseEntity.badRequest().body(response);
         }
 
         // 创建用户角色关联
         UserRole userRole = new UserRole();
-        userRole.setUserId(userId);
-        userRole.setRoleId(roleId);
+        userRole.setUser(user);
+        userRole.setRole(role);
         userRoleRepository.save(userRole);
 
         // 清除用户权限缓存
@@ -147,9 +157,9 @@ public class PermissionController {
         }
 
         // 查找并删除用户角色关联
-        List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
+        List<UserRole> userRoles = userRoleRepository.findByUser_Id(userId);
         userRoles.stream()
-                .filter(ur -> ur.getRoleId().equals(roleId))
+                .filter(ur -> ur.getRole().getId().equals(roleId))
                 .findFirst()
                 .ifPresent(userRoleRepository::delete);
 
@@ -183,16 +193,26 @@ public class PermissionController {
         }
 
         // 检查是否已经分配了该权限
-        if (rolePermissionRepository.existsByRoleIdAndPermissionId(roleId, permissionId)) {
+        if (rolePermissionRepository.existsByRole_IdAndPermission_Id(roleId, permissionId)) {
             response.put("message", "角色已经拥有该权限");
+            response.put("status", "error");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 获取角色和权限实体
+        Role role = roleRepository.findById(roleId).orElse(null);
+        Permission permission = permissionRepository.findById(permissionId).orElse(null);
+        
+        if (role == null || permission == null) {
+            response.put("message", "角色或权限不存在");
             response.put("status", "error");
             return ResponseEntity.badRequest().body(response);
         }
 
         // 创建角色权限关联
         RolePermission rolePermission = new RolePermission();
-        rolePermission.setRoleId(roleId);
-        rolePermission.setPermissionId(permissionId);
+        rolePermission.setRole(role);
+        rolePermission.setPermission(permission);
         rolePermissionRepository.save(rolePermission);
 
         // 清除所有用户权限缓存（因为角色权限变更会影响所有拥有该角色的用户）
@@ -219,9 +239,9 @@ public class PermissionController {
         }
 
         // 查找并删除角色权限关联
-        List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleId(roleId);
+        List<RolePermission> rolePermissions = rolePermissionRepository.findByRole_Id(roleId);
         rolePermissions.stream()
-                .filter(rp -> rp.getPermissionId().equals(permissionId))
+                .filter(rp -> rp.getPermission().getId().equals(permissionId))
                 .findFirst()
                 .ifPresent(rolePermissionRepository::delete);
 
