@@ -14,7 +14,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_tenants")
+@Table(name = "sys_tenants", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_tenant_name", columnNames = "name")
+})
 @EntityListeners(AuditingEntityListener.class)
 @Comment("租户表")
 public class Tenant {

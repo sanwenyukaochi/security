@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "sys_roles")
 @EntityListeners(AuditingEntityListener.class)
+@Comment("角色表")
 public class Role extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
