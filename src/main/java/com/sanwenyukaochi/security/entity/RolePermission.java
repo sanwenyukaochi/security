@@ -1,11 +1,6 @@
 package com.sanwenyukaochi.security.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 
@@ -23,12 +18,14 @@ import org.hibernate.annotations.Comment;
 public class RolePermission extends BaseIdEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_role_permission_role_id"))
     @Comment("角色ID")
     private Role role;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "permission_id", nullable = false)
+    @JoinColumn(name = "permission_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_role_permission_permission_id"))
     @Comment("权限ID")
     private Permission permission;
 }

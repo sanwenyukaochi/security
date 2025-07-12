@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "sys_permissions")
 @EntityListeners(AuditingEntityListener.class)
+@Comment("权限表")
 public class Permission  extends BaseEntity {
 
     @Column(name = "parent_id", nullable = false)

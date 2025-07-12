@@ -24,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class User extends BaseEntity{
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tenant", nullable = false)
+    @JoinColumn(name = "tenant", nullable = false, 
+        foreignKey = @ForeignKey(name = "fk_user_tenant"))
     @Comment("租户信息")
     private Tenant tenant;
 

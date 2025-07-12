@@ -26,4 +26,4 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     
     @EntityGraph(attributePaths = {"rolePermissions"})
     List<Permission> findByType(String type);
-} 
+}
