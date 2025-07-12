@@ -22,7 +22,7 @@ public class User extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant", nullable = false)
     @Comment("租户信息")
-    private SysTenant tenant;
+    private Tenant tenant;
 
     @Column(name = "user_name", length = 50, nullable = false)
     @Comment("用户名")

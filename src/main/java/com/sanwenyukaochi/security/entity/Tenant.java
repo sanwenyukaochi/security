@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "sys_tenants")
 @EntityListeners(AuditingEntityListener.class)
 @Comment("租户表")
-public class SysTenant {
+public class Tenant {
 
     @Id
     @Column(name = "id", nullable = false)

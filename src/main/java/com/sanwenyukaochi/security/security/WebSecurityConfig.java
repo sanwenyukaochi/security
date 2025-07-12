@@ -1,8 +1,8 @@
 package com.sanwenyukaochi.security.security;
 
-import com.sanwenyukaochi.security.entity.SysTenant;
+import com.sanwenyukaochi.security.entity.Tenant;
 import com.sanwenyukaochi.security.entity.User;
-import com.sanwenyukaochi.security.repository.SysTenantRepository;
+import com.sanwenyukaochi.security.repository.TenantRepository;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.security.jwt.AuthTokenFilter;
 import com.sanwenyukaochi.security.security.jwt.AuthEntryPointJwt;
@@ -20,7 +20,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -98,16 +97,16 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public CommandLineRunner initData(SysTenantRepository sysTenantRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(TenantRepository tenantRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (!sysTenantRepository.existsByName("测试组")) {
-                SysTenant sysTenant = new SysTenant();
-                sysTenant.setId(1L);
-                sysTenant.setName("测试组");
-                sysTenant.setCode("");
-                sysTenant.setCreatedBy(1L);
-                sysTenant.setUpdatedBy(1L);
-                sysTenantRepository.save(sysTenant);
+            if (!tenantRepository.existsByName("测试组")) {
+                Tenant tenant = new Tenant();
+                tenant.setId(1L);
+                tenant.setName("测试组");
+                tenant.setCode("");
+                tenant.setCreatedBy(1L);
+                tenant.setUpdatedBy(1L);
+                tenantRepository.save(tenant);
             }
             
             // Create users if not already present
@@ -115,7 +114,7 @@ public class WebSecurityConfig {
                 User user1 = new User();
                 user1.setId(1L);
                 user1.setTenantId(1L);
-                user1.setTenant(sysTenantRepository.findById(1L).orElseThrow());
+                user1.setTenant(tenantRepository.findById(1L).orElseThrow());
                 user1.setUserName("user1");
                 user1.setPassword(passwordEncoder.encode("123456"));
                 user1.setEmail("");

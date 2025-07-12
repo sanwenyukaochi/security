@@ -13,12 +13,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "sys_roles")
 @EntityListeners(AuditingEntityListener.class)
-public class SysRole extends BaseEntity {
+public class Role extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant", nullable = false)
     @Comment("租户信息")
-    private SysTenant tenant;
+    private Tenant tenant;
 
     @Column(name = "name", length = 100, nullable = false)
     @Comment("角色名称")

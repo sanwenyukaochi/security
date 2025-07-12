@@ -4,8 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import com.sanwenyukaochi.security.entity.SysTenant;
+import com.sanwenyukaochi.security.entity.Tenant;
 import com.sanwenyukaochi.security.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,12 +16,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class UserDetailsImpl implements UserDetails {
     
     private Long id;
 
-    private SysTenant tenant;
+    private Tenant tenant;
 
     private String username;
     
@@ -41,22 +43,23 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id,SysTenant tenant, String username, String password, String email, String phone, 
-                           Boolean status, Boolean accountNonExpired, Boolean accountNonLocked, Boolean credentialsNonExpired,
-                           Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.phone = phone;
-        this.tenant = tenant;
-        this.password = password;
-        this.authorities = authorities;
-        this.accountNonExpired = accountNonExpired;
-        this.accountNonLocked = accountNonLocked;
-        this.credentialsNonExpired = credentialsNonExpired;
-        this.status = status;
-    }
 
+//    public UserDetailsImpl(Long id,SysTenant tenant, String username, String password, String email, String phone,
+//                           Boolean status, Boolean accountNonExpired, Boolean accountNonLocked, Boolean credentialsNonExpired,
+//                           Collection<? extends GrantedAuthority> authorities) {
+//        this.id = id;
+//        this.username = username;
+//        this.email = email;
+//        this.phone = phone;
+//        this.tenant = tenant;
+//        this.password = password;
+//        this.authorities = authorities;
+//        this.accountNonExpired = accountNonExpired;
+//        this.accountNonLocked = accountNonLocked;
+//        this.credentialsNonExpired = credentialsNonExpired;
+//        this.status = status;
+//    }
+    
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = null;
                 /*user.getRoles().stream()
