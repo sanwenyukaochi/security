@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.TenantId;
 
 import java.io.Serializable;
 
@@ -24,7 +23,7 @@ public abstract class BaseIdEntity implements Serializable {
     @Comment("主键ID")
     private Long id;
 
-    //@TenantId
+    // @TenantId
     @Column(name = "tenant_id", nullable = false)
     @Comment("租户ID")
     private Long tenantId;
