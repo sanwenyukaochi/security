@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
 
     Optional<Tenant> findByName(String name);
+    
+    Optional<Tenant> findByCode(String code);
 
 }
