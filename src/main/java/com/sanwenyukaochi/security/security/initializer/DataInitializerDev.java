@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Profile({"dev"})
 @RequiredArgsConstructor
 @Slf4j
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializerDev implements CommandLineRunner {
 
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
@@ -30,101 +30,105 @@ public class DataInitializer implements CommandLineRunner {
         log.info("=== 开始初始化RBAC权限系统 ===");
 
         // 创建租户
-        Tenant tenant = createTenant();
+        Long creatorId = snowflake.nextId();
+        Tenant tenant = createTenant(snowflake.nextId(), "测试组", "test_group", true, creatorId, creatorId);
 
-        // 创建用户
-        User userAdmin = createUser("adminadmin", "12345678", "admin@example.com", "13800138001", tenant);
-        User userTenant = createUser("tenant", "123456", "tenant@example.com", "13800138002", tenant);
-        User userUser = createUser("user", "123456", "user@example.com", "13800138003", tenant);
+        // 创建默认管理员用户
+        Long adminId = snowflake.nextId();
+        User defaultAdmin = createUser(adminId, "adminadmin", "12345678", "admin@example.com", "13800138001", true, true, true, true , tenant, adminId, adminId);
+
+        // 创建其他用户
+        User userTenant = createUser(snowflake.nextId(), "tenant", "123456", "tenant@example.com", "13800138002", true, true, true, true, tenant, adminId, adminId);
+        User userUser = createUser(snowflake.nextId(), "user", "123456", "user@example.com", "13800138003", true, true, true, true, tenant, adminId, adminId);
 
         // 创建角色
-        Role roleAdmin = createRole("admin", "系统管理员", 0, tenant);
-        Role roleTenant = createRole("tenant", "租户管理员", 1, tenant);
-        Role roleUser = createRole("user", "普通用户", 2, tenant);
+        Role roleAdmin = createRole(snowflake.nextId(), "admin", "系统管理员", 0, true, tenant, adminId, adminId);
+        Role roleTenant = createRole(snowflake.nextId(), "tenant", "租户管理员", 1, true, tenant, adminId, adminId);
+        Role roleUser = createRole(snowflake.nextId(), "user", "普通用户", 2, true, tenant, adminId, adminId);
 
         // 创建权限
-        Permission userManagePermission = createPermission("user:manage", "用户管理", "/user", 1, 0L, "1", tenant);
-        Permission userViewPermission = createPermission("user:view", "用户查看", "/user/view", 1, userManagePermission.getId(), "2", tenant);
-        Permission userAddPermission = createPermission("user:add", "用户新增", "/user/add", 2, userManagePermission.getId(), "2", tenant);
-        Permission userEditPermission = createPermission("user:edit", "用户编辑", "/user/edit", 3, userManagePermission.getId(), "2", tenant);
-        Permission userDeletePermission = createPermission("user:delete", "用户删除", "/user/delete", 4, userManagePermission.getId(), "2", tenant);
+        Permission userManagePermission = createPermission(snowflake.nextId(), "user:manage", "用户管理", "/user", 1, snowflake.nextId(), "1", true, tenant, adminId, adminId);
+        Permission userViewPermission = createPermission(snowflake.nextId(), "user:view", "用户查看", "/user/view", 1, userManagePermission.getId(), "2", true, tenant, adminId, adminId);
+        Permission userAddPermission = createPermission(snowflake.nextId(), "user:add", "用户新增", "/user/add", 2, userManagePermission.getId(), "2", true, tenant, adminId, adminId);
+        Permission userEditPermission = createPermission(snowflake.nextId(), "user:edit", "用户编辑", "/user/edit", 3, userManagePermission.getId(), "2", true, tenant, adminId, adminId);
+        Permission userDeletePermission = createPermission(snowflake.nextId(), "user:delete", "用户删除", "/user/delete", 4, userManagePermission.getId(), "2", true, tenant, adminId, adminId);
 
         // 绑定用户和角色
-        bindUserAndRole(userAdmin, roleAdmin, tenant);
-        bindUserAndRole(userTenant, roleTenant, tenant);
-        bindUserAndRole(userUser, roleUser, tenant);
+        bindUserAndRole(snowflake.nextId(), defaultAdmin, roleAdmin, tenant);
+        bindUserAndRole(snowflake.nextId(), userTenant, roleTenant, tenant);
+        bindUserAndRole(snowflake.nextId(), userUser, roleUser, tenant);
 
         // 绑定角色和权限
-        bindRoleAndPermission(roleAdmin, userManagePermission, tenant);
-        bindRoleAndPermission(roleAdmin, userViewPermission, tenant);
-        bindRoleAndPermission(roleAdmin, userAddPermission, tenant);
-        bindRoleAndPermission(roleAdmin, userEditPermission, tenant);
-        bindRoleAndPermission(roleAdmin, userDeletePermission, tenant);
-        bindRoleAndPermission(roleTenant, userViewPermission, tenant);
-        bindRoleAndPermission(roleTenant, userEditPermission, tenant);
-        bindRoleAndPermission(roleUser, userViewPermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userManagePermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userViewPermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userAddPermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userEditPermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userDeletePermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleTenant, userViewPermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleTenant, userEditPermission, tenant);
+        bindRoleAndPermission(snowflake.nextId(), roleUser, userViewPermission, tenant);
 
         // 打印初始化结果
-        printInitializationResult(tenant, userAdmin, userTenant, userUser, roleAdmin, roleTenant, roleUser);
+        printInitializationResult(tenant, defaultAdmin, userTenant, userUser, roleAdmin, roleTenant, roleUser);
     }
 
-    private Tenant createTenant() {
-        return tenantRepository.findByName("测试组")
+    private Tenant createTenant(Long id, String name, String code, Boolean status, Long createdBy, Long updatedBy) {
+        return tenantRepository.findByName(name)
                 .orElseGet(() -> {
                     Tenant newTenant = new Tenant();
-                    newTenant.setId(snowflake.nextId());
-                    newTenant.setName("测试组");
-                    newTenant.setCode("test_group");
-                    newTenant.setStatus(true);
-                    newTenant.setCreatedBy(1L);
-                    newTenant.setUpdatedBy(1L);
+                    newTenant.setId(id);
+                    newTenant.setName(name);
+                    newTenant.setCode(code);
+                    newTenant.setStatus(status);
+                    newTenant.setCreatedBy(createdBy);
+                    newTenant.setUpdatedBy(updatedBy);
                     return tenantRepository.save(newTenant);
                 });
     }
 
-    private User createUser(String username, String password, String email, String phone, Tenant tenant) {
+    private User createUser(Long id, String username, String password, String email, String phone, Boolean status, Boolean accountNonExpired, Boolean accountNonLocked, Boolean credentialsNonExpired, Tenant tenant, Long createdBy, Long updatedBy) {
         return userRepository.findByUserName(username)
                 .orElseGet(() -> {
                     User newUser = new User();
-                    newUser.setId(snowflake.nextId());
+                    newUser.setId(id);
                     newUser.setTenant(tenant);
                     newUser.setTenantId(tenant.getId());
                     newUser.setUserName(username);
                     newUser.setPassword(passwordEncoder.encode(password));
                     newUser.setEmail(email);
                     newUser.setPhone(phone);
-                    newUser.setStatus(true);
-                    newUser.setAccountNonExpired(true);
-                    newUser.setAccountNonLocked(true);
-                    newUser.setCredentialsNonExpired(true);
-                    newUser.setCreatedBy(1L);
-                    newUser.setUpdatedBy(1L);
+                    newUser.setStatus(status);
+                    newUser.setAccountNonExpired(accountNonExpired);
+                    newUser.setAccountNonLocked(accountNonLocked);
+                    newUser.setCredentialsNonExpired(credentialsNonExpired);
+                    newUser.setCreatedBy(createdBy);
+                    newUser.setUpdatedBy(updatedBy);
                     return userRepository.save(newUser);
                 });
     }
 
-    private Role createRole(String code, String name, Integer dataScope, Tenant tenant) {
+    private Role createRole(Long id, String code, String name, Integer dataScope, Boolean status, Tenant tenant, Long createdBy, Long updatedBy) {
         return roleRepository.findByCode(code)
                 .orElseGet(() -> {
                     Role newRole = new Role();
-                    newRole.setId(snowflake.nextId());
+                    newRole.setId(id);
                     newRole.setTenant(tenant);
                     newRole.setTenantId(tenant.getId());
                     newRole.setName(name);
                     newRole.setCode(code);
                     newRole.setDataScope(dataScope);
-                    newRole.setStatus(true);
-                    newRole.setCreatedBy(1L);
-                    newRole.setUpdatedBy(1L);
+                    newRole.setStatus(status);
+                    newRole.setCreatedBy(createdBy);
+                    newRole.setUpdatedBy(updatedBy);
                     return roleRepository.save(newRole);
                 });
     }
 
-    private Permission createPermission(String code, String name, String path, Integer sort, Long parentId, String type, Tenant tenant) {
+    private Permission createPermission(Long id, String code, String name, String path, Integer sort, Long parentId, String type, Boolean visible, Tenant tenant, Long createdBy, Long updatedBy) {
         return permissionRepository.findByCode(code)
                 .orElseGet(() -> {
                     Permission newPermission = new Permission();
-                    newPermission.setId(snowflake.nextId());
+                    newPermission.setId(id);
                     newPermission.setTenantId(tenant.getId());
                     newPermission.setParentId(parentId);
                     newPermission.setType(type);
@@ -132,18 +136,18 @@ public class DataInitializer implements CommandLineRunner {
                     newPermission.setCode(code);
                     newPermission.setPath(path);
                     newPermission.setSort(sort);
-                    newPermission.setVisible(true);
-                    newPermission.setCreatedBy(1L);
-                    newPermission.setUpdatedBy(1L);
+                    newPermission.setVisible(visible);
+                    newPermission.setCreatedBy(createdBy);
+                    newPermission.setUpdatedBy(updatedBy);
                     return permissionRepository.save(newPermission);
                 });
     }
 
-    private void bindUserAndRole(User user, Role role, Tenant tenant) {
+    private void bindUserAndRole(Long id, User user, Role role, Tenant tenant) {
         userRoleRepository.findByUser_IdAndRole_Id(user.getId(), role.getId())
                 .orElseGet(() -> {
                     UserRole newUserRole = new UserRole();
-                    newUserRole.setId(snowflake.nextId());
+                    newUserRole.setId(id);
                     newUserRole.setTenantId(tenant.getId());
                     newUserRole.setUser(user);
                     newUserRole.setRole(role);
@@ -151,11 +155,11 @@ public class DataInitializer implements CommandLineRunner {
                 });
     }
 
-    private void bindRoleAndPermission(Role role, Permission permission, Tenant tenant) {
+    private void bindRoleAndPermission(Long id, Role role, Permission permission, Tenant tenant) {
         rolePermissionRepository.findByRole_IdAndPermission_Id(role.getId(), permission.getId())
                 .orElseGet(() -> {
                     RolePermission newRolePermission = new RolePermission();
-                    newRolePermission.setId(snowflake.nextId());
+                    newRolePermission.setId(id);
                     newRolePermission.setTenantId(tenant.getId());
                     newRolePermission.setRole(role);
                     newRolePermission.setPermission(permission);
@@ -186,6 +190,8 @@ public class DataInitializer implements CommandLineRunner {
         log.info("   ├─ 系统管理员: {} (密码: 12345678)", userAdmin.getUserName());
         log.info("   ├─ 租户管理员: {} (密码: 123456)", userTenant.getUserName());
         log.info("   └─ 普通用户: {} (密码: 123456)", userUser.getUserName());
+        log.info("");
+        log.info("👤 默认创建者: {} (ID: {})", userAdmin.getUserName(), userAdmin.getId());
         log.info("=== 初始化完成 ===");
     }
 } 
