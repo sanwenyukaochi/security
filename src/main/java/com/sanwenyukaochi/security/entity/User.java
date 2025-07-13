@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @Entity
 @Table(name = "sys_users",
-        indexes = {@Index(name = "uk_user_username", columnList = "user_name, tenant_id", unique = true)}
+        indexes = {@Index(name = "uk_user_username", columnList = "created_by, user_name, tenant_id", unique = true)}
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("用户表")
