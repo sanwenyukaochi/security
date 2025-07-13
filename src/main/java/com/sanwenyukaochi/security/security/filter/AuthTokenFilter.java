@@ -1,6 +1,7 @@
-package com.sanwenyukaochi.security.security.jwt;
+package com.sanwenyukaochi.security.security.filter;
 
 
+import com.sanwenyukaochi.security.security.jwt.JwtUtils;
 import com.sanwenyukaochi.security.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +26,7 @@ import java.io.IOException;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
-    private  JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
     
     @Autowired
     private  UserDetailsServiceImpl userDetailsService;

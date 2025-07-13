@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.exception;
 
+import com.sanwenyukaochi.security.security.filter.RequestIdFilter;
 import com.sanwenyukaochi.security.vo.Result;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.validation.FieldError;
@@ -95,10 +95,17 @@ public class MyGlobalExceptionHandler {
      */
     private String getRequestId() {
         try {
+            // 优先从RequestIdFilter获取
+            String requestId = RequestIdFilter.getCurrentRequestId();
+            if (requestId != null && !requestId.trim().isEmpty()) {
+                return requestId;
+            }
+            
+            // 备用方案：从请求头获取或生成新的
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 jakarta.servlet.http.HttpServletRequest request = attributes.getRequest();
-                String requestId = request.getHeader("X-Request-ID");
+                requestId = request.getHeader("X-Request-ID");
                 if (requestId == null || requestId.trim().isEmpty()) {
                     requestId = "req-" + System.currentTimeMillis() + "-" + java.util.UUID.randomUUID().toString().substring(0, 8);
                 }

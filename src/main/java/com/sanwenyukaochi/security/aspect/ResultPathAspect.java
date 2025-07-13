@@ -1,6 +1,6 @@
 package com.sanwenyukaochi.security.aspect;
 
-import com.sanwenyukaochi.security.interceptor.RequestIdInterceptor;
+import com.sanwenyukaochi.security.security.filter.RequestIdFilter;
 import com.sanwenyukaochi.security.vo.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -36,7 +36,7 @@ public class ResultPathAspect {
             }
             
             // 设置请求ID
-            String requestId = RequestIdInterceptor.getCurrentRequestId();
+            String requestId = RequestIdFilter.getCurrentRequestId();
             if (requestId != null) {
                 resultObj.setRequestId(requestId);
             }

@@ -3,8 +3,9 @@ package com.sanwenyukaochi.security.security;
 import cn.hutool.core.lang.Snowflake;
 import com.sanwenyukaochi.security.entity.*;
 import com.sanwenyukaochi.security.repository.*;
-import com.sanwenyukaochi.security.filter.RequestRejectedExceptionFilter;
-import com.sanwenyukaochi.security.security.jwt.AuthTokenFilter;
+import com.sanwenyukaochi.security.security.filter.RequestIdFilter;
+import com.sanwenyukaochi.security.security.filter.RequestRejectedExceptionFilter;
+import com.sanwenyukaochi.security.security.filter.AuthTokenFilter;
 import com.sanwenyukaochi.security.security.jwt.AuthEntryPointJwt;
 import com.sanwenyukaochi.security.security.jwt.AccessDeniedHandlerJwt;
 import com.sanwenyukaochi.security.security.service.UserDetailsServiceImpl;
@@ -42,16 +43,13 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 public class WebSecurityConfig {
     
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final AuthTokenFilter authenticationJwtTokenFilter;
     private final CustomPermissionEvaluator customPermissionEvaluator;
     private final AuthEntryPointJwt unauthorizedHandler;
     private final AccessDeniedHandlerJwt accessDeniedHandler;
     private final RequestRejectedExceptionFilter requestRejectedExceptionFilter;
+    private final RequestIdFilter requestIdFilter;
     private final Snowflake snowflake;
-    
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -115,8 +113,9 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
         );
         http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(requestIdFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(requestRejectedExceptionFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticationJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         return http.build();
     }

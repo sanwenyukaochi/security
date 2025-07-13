@@ -1,7 +1,6 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sanwenyukaochi.security.interceptor.RequestIdInterceptor;
 import com.sanwenyukaochi.security.vo.Result;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
