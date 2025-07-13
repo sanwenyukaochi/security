@@ -1,6 +1,8 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sanwenyukaochi.security.interceptor.RequestIdInterceptor;
+import com.sanwenyukaochi.security.vo.Result;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,8 +14,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
@@ -23,19 +23,24 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
-        logger.error("Unauthorized error: {}", authException.getMessage());
+        logger.error("未授权错误: {}", authException.getMessage());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+        // 获取请求ID，优先从请求头获取，否则生成新的
+        String requestId = request.getHeader("X-Request-ID");
+        if (requestId == null || requestId.trim().isEmpty()) {
+            requestId = "req-" + System.currentTimeMillis() + "-" + java.util.UUID.randomUUID().toString().substring(0, 8);
+        }
+
+        // 使用统一的Result格式
+        Result<String> result = Result.error(401, "认证失败","")
+                .path(request.getRequestURI())
+                .requestId(requestId);
 
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+        mapper.writeValue(response.getOutputStream(), result);
     }
 
 }

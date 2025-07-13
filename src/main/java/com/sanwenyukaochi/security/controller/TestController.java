@@ -7,6 +7,7 @@ import com.sanwenyukaochi.security.repository.RolePermissionRepository;
 import com.sanwenyukaochi.security.repository.RoleRepository;
 import com.sanwenyukaochi.security.repository.PermissionRepository;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
+import com.sanwenyukaochi.security.vo.Result;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,21 +35,21 @@ public class TestController {
     private final PermissionRepository permissionRepository;
 
     @GetMapping("/public")
-    public ResponseEntity<Map<String, Object>> publicEndpoint(Authentication authentication) {
+    public Result<Map<String, Object>> publicEndpoint(Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "这是公开接口，任何人都可以访问");
         response.put("status", "success");
         response.put("authentication", authentication);
-        return ResponseEntity.ok(response);
+        return Result.success(response);
     }
 
     @GetMapping("/user-vo")
-    public ResponseEntity<Map<String, Object>> getUserVo(Authentication authentication) {
+    public Result<Map<String, Object>> getUserVo(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "用户未认证");
             response.put("status", "error");
-            return ResponseEntity.badRequest().body(response);
+            return Result.error(401,"用户未认证", response);
         }
 
         // 使用Repository查询来避免懒加载问题
@@ -197,7 +198,7 @@ public class TestController {
             response.put("userBasicInfo", userVo);
             response.put("exception", e.getClass().getSimpleName());
             response.put("stackTrace", e.getStackTrace());
-            return ResponseEntity.ok(response);
+            return Result.success(response);
         }
         
         Map<String, Object> response = new HashMap<>();
@@ -210,7 +211,7 @@ public class TestController {
             "rolesCount", userVo.getRoles().size(),
             "permissionsCount", userVo.getPermissions().size()
         ));
-        return ResponseEntity.ok(response);
+        return Result.success(response);
     }
 
     @GetMapping("/user")

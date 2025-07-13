@@ -133,8 +133,8 @@ public class WebSecurityConfig {
                         newUser.setId(snowflake.nextId());
                         newUser.setTenant(tenant);
                         newUser.setTenantId(tenant.getId());
-                        newUser.setUserName("admin");
-                        newUser.setPassword(passwordEncoder.encode("123456"));
+                        newUser.setUserName("adminadmin");
+                        newUser.setPassword(passwordEncoder.encode("12345678"));
                         newUser.setEmail("admin@example.com");
                         newUser.setPhone("13800138001");
                         newUser.setStatus(true);
