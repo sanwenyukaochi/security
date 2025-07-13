@@ -1,11 +1,7 @@
 package com.sanwenyukaochi.security.controller;
 
 import com.sanwenyukaochi.security.entity.*;
-import com.sanwenyukaochi.security.repository.UserRepository;
-import com.sanwenyukaochi.security.repository.UserRoleRepository;
-import com.sanwenyukaochi.security.repository.RolePermissionRepository;
-import com.sanwenyukaochi.security.repository.RoleRepository;
-import com.sanwenyukaochi.security.repository.PermissionRepository;
+import com.sanwenyukaochi.security.repository.*;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import com.sanwenyukaochi.security.vo.Result;
 import lombok.AllArgsConstructor;
@@ -33,6 +29,7 @@ public class TestController {
     private final RolePermissionRepository rolePermissionRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final VideoRepository videoRepository;
 
     @GetMapping("/public")
     public Result<Map<String, Object>> publicEndpoint(Authentication authentication) {
@@ -54,7 +51,7 @@ public class TestController {
 
         // 使用Repository查询来避免懒加载问题
         User user = userRepository.findByUserName(authentication.getName()).orElseThrow();
-        
+
         // 详细的VO类定义，包含完整的权限信息
         @Setter
         @Getter
@@ -77,7 +74,7 @@ public class TestController {
                 this.phone = user.getPhone();
                 this.status = user.getStatus();
                 this.tenant = user.getTenant();
-                
+
                 // 初始化空列表，避免懒加载
                 this.roles = new ArrayList<>();
                 this.permissions = new ArrayList<>();
@@ -149,29 +146,29 @@ public class TestController {
 
         // 创建VO实例
         DetailedUserVo userVo = new DetailedUserVo(user);
-        
+
         // 使用Repository查询来安全地获取角色和权限信息
         try {
             // 获取用户角色
             List<UserRole> userRoles = userRoleRepository.findByUser_Id(user.getId());
             System.out.println("找到用户角色数量: " + userRoles.size());
-            
+
             List<DetailedUserVo.RoleVo> roleVos = new ArrayList<>();
             Set<DetailedUserVo.PermissionVo> permissionVos = new HashSet<>();
-            
+
             for (UserRole userRole : userRoles) {
                 System.out.println("处理用户角色: " + userRole.getId());
-                
+
                 // 通过ID直接查询角色，避免懒加载
                 Role role = roleRepository.findById(userRole.getRole().getId()).orElse(null);
                 if (role != null) {
                     System.out.println("角色信息: " + role.getName() + " (" + role.getCode() + ")");
                     roleVos.add(new DetailedUserVo.RoleVo(role));
-                    
+
                     // 获取角色的权限
                     List<RolePermission> rolePermissions = rolePermissionRepository.findByRole_Id(role.getId());
                     System.out.println("角色 " + role.getCode() + " 的权限数量: " + rolePermissions.size());
-                    
+
                     for (RolePermission rolePermission : rolePermissions) {
                         // 通过ID直接查询权限，避免懒加载
                         Permission permission = permissionRepository.findById(rolePermission.getPermission().getId()).orElse(null);
@@ -182,14 +179,14 @@ public class TestController {
                     }
                 }
             }
-            
+
             System.out.println("最终角色数量: " + roleVos.size());
             System.out.println("最终权限数量: " + permissionVos.size());
-            
+
             // 设置VO数据
             userVo.roles = roleVos;
             userVo.permissions = new ArrayList<>(permissionVos);
-                    
+
         } catch (Exception e) {
             // 如果出现异常，返回详细错误信息
             Map<String, Object> response = new HashMap<>();
@@ -200,16 +197,16 @@ public class TestController {
             response.put("stackTrace", e.getStackTrace());
             return Result.success(response);
         }
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("message", "用户VO数据");
         response.put("status", "success");
         response.put("userVo", userVo);
         response.put("debug", Map.of(
-            "userId", user.getId(),
-            "userName", user.getUserName(),
-            "rolesCount", userVo.getRoles().size(),
-            "permissionsCount", userVo.getPermissions().size()
+                "userId", user.getId(),
+                "userName", user.getUserName(),
+                "rolesCount", userVo.getRoles().size(),
+                "permissionsCount", userVo.getPermissions().size()
         ));
         return Result.success(response);
     }
@@ -336,31 +333,31 @@ public class TestController {
         }
 
         User user = userRepository.findByUserName(authentication.getName()).orElseThrow();
-        
+
         Map<String, Object> debugInfo = new HashMap<>();
         debugInfo.put("userId", user.getId());
         debugInfo.put("userName", user.getUserName());
         debugInfo.put("email", user.getEmail());
-        
+
         // 检查用户角色
         List<UserRole> userRoles = userRoleRepository.findByUser_Id(user.getId());
         debugInfo.put("userRolesCount", userRoles.size());
-        
+
         List<Map<String, Object>> roleDetails = new ArrayList<>();
         for (UserRole userRole : userRoles) {
             Map<String, Object> roleInfo = new HashMap<>();
             roleInfo.put("userRoleId", userRole.getId());
-            
+
             if (userRole.getRole() != null) {
                 Role role = userRole.getRole();
                 roleInfo.put("roleId", role.getId());
                 roleInfo.put("roleName", role.getName());
                 roleInfo.put("roleCode", role.getCode());
-                
+
                 // 检查角色权限
                 List<RolePermission> rolePermissions = rolePermissionRepository.findByRole_Id(role.getId());
                 roleInfo.put("rolePermissionsCount", rolePermissions.size());
-                
+
                 List<String> permissionCodes = new ArrayList<>();
                 for (RolePermission rolePermission : rolePermissions) {
                     if (rolePermission.getPermission() != null) {
@@ -375,15 +372,74 @@ public class TestController {
                 roleInfo.put("rolePermissionsCount", 0);
                 roleInfo.put("permissionCodes", new ArrayList<>());
             }
-            
+
             roleDetails.add(roleInfo);
         }
         debugInfo.put("roleDetails", roleDetails);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("message", "调试用户信息");
         response.put("status", "success");
         response.put("debugInfo", debugInfo);
         return ResponseEntity.ok(response);
     }
+    
+    
+
+    /**
+     * 获取当前租户的所有用户
+     */
+    @GetMapping("/users")
+    public Result<List<User>> getCurrentTenantUsers() {
+        List<User> users = userRepository.findAll();
+        return Result.success(users);
+    }
+
+    /**
+     * 获取当前租户的所有视频
+     */
+    @GetMapping("/videos")
+    public Result<List<Video>> getCurrentTenantVideos() {
+        List<Video> videos = videoRepository.findAll();
+        return Result.success(videos);
+    }
+
+    /**
+     * 根据ID获取用户
+     */
+    @GetMapping("/users/{id}")
+    public Result<User> getUserById(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(Result::success)
+                .orElse(Result.error(404, "用户不存在"));
+    }
+
+    /**
+     * 根据ID获取视频
+     */
+    @GetMapping("/videos/{id}")
+    public Result<Video> getVideoById(@PathVariable Long id) {
+        return videoRepository.findById(id)
+                .map(Result::success)
+                .orElse(Result.error(404, "视频不存在"));
+    }
+
+    /**
+     * 获取用户数量
+     */
+    @GetMapping("/users/count")
+    public Result<Long> getUserCount() {
+        long count = userRepository.count();
+        return Result.success(count);
+    }
+
+    /**
+     * 获取视频数量
+     */
+    @GetMapping("/videos/count")
+    public Result<Long> getVideoCount() {
+        long count = videoRepository.count();
+        return Result.success(count);
+    }
+
 } 

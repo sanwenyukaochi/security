@@ -167,8 +167,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 });
     }
 
-    private void printInitializationResult(Tenant tenant, User userAdmin, User userTenant, User userUser, 
-                                        Role roleAdmin, Role roleTenant, Role roleUser) {
+    private void printInitializationResult(Tenant tenant, User userAdmin, User userTenant, User userUser, Role roleAdmin, Role roleTenant, Role roleUser) {
         log.info("=== RBAC权限系统初始化完成 ===");
         log.info("🗃️ 数据统计:");
         log.info("   ├─ 租户: {} (ID: {})", tenant.getName(), tenant.getId());
