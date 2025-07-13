@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.exception;
 
+import com.sanwenyukaochi.security.security.exception.CustomAuthenticationException;
 import com.sanwenyukaochi.security.security.filter.RequestIdFilter;
 import com.sanwenyukaochi.security.vo.Result;
 import org.springframework.security.access.AccessDeniedException;

@@ -1,4 +1,4 @@
-package com.sanwenyukaochi.security.exception;
+package com.sanwenyukaochi.security.security.exception;
 
 import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;

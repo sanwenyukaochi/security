@@ -1,4 +1,4 @@
-package com.sanwenyukaochi.security.exception;
+package com.sanwenyukaochi.security.security.exception;
 
 /**
  * 认证异常工厂 - 简化版本
