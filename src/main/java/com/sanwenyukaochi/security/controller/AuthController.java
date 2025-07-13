@@ -2,6 +2,8 @@ package com.sanwenyukaochi.security.controller;
 
 
 import com.sanwenyukaochi.security.entity.User;
+import com.sanwenyukaochi.security.exception.AuthenticationExceptionFactory;
+import com.sanwenyukaochi.security.exception.CustomAuthenticationException;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.security.jwt.JwtUtils;
 import com.sanwenyukaochi.security.security.request.LoginRequest;
@@ -10,11 +12,10 @@ import com.sanwenyukaochi.security.security.response.MessageResponse;
 import com.sanwenyukaochi.security.security.response.UserInfoResponse;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import com.sanwenyukaochi.security.service.UserPermissionCacheService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.sanwenyukaochi.security.vo.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,17 +41,20 @@ public class AuthController {
     private final UserPermissionCacheService userPermissionCacheService;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    public Result<Map<String,Object>> authenticateUser(@RequestBody LoginRequest loginRequest) {
         
         Authentication authentication;
         try {
             authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         } catch (AuthenticationException exception) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "Bad credentials");
-            map.put("status", false);
-            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
+            // 根据异常类型抛出相应的自定义异常
+            if (exception instanceof CustomAuthenticationException) {
+                throw exception; // 直接抛出，因为已经是自定义异常
+            } else {
+                // 其他认证异常（如密码错误）转换为密码错误异常
+                throw AuthenticationExceptionFactory.invalidPassword(loginRequest.getUsername());
+            }
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -66,9 +70,7 @@ public class AuthController {
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
                 userDetails.getUsername(), roles, jwtCookie.toString());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-                jwtCookie.toString())
-                .body(response);
+        return Result.success(Map.of("user", response, "token", jwtCookie.getValue()));
     }
 
     @PostMapping("/signup")

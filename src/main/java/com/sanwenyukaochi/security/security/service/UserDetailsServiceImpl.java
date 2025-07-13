@@ -1,6 +1,8 @@
 package com.sanwenyukaochi.security.security.service;
 
 import com.sanwenyukaochi.security.entity.User;
+import com.sanwenyukaochi.security.exception.AuthenticationExceptionFactory;
+import com.sanwenyukaochi.security.exception.CustomAuthenticationException;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.service.UserPermissionService;
 import com.sanwenyukaochi.security.service.UserPermissionCacheService;
@@ -23,7 +25,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+                .orElseThrow(() -> AuthenticationExceptionFactory.userNotFound(username));
+
+        // 检查账户状态
+        if (!user.getStatus()) {
+            throw AuthenticationExceptionFactory.accountStatus(username, "DISABLED");
+        }
+
+        if (!user.getAccountNonLocked()) {
+            throw AuthenticationExceptionFactory.accountStatus(username, "LOCKED");
+        }
+
         return UserDetailsImpl.build(user, userPermissionService, userPermissionCacheService);
     }
     
