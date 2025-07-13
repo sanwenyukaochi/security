@@ -2,6 +2,7 @@ package com.sanwenyukaochi.security.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -18,7 +19,7 @@ public class RequestIdInterceptor implements HandlerInterceptor {
     private static final String REQUEST_ID_HEADER = "X-Request-ID";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         // 优先从请求头获取请求ID，如果没有则生成新的
         String requestId = request.getHeader(REQUEST_ID_HEADER);
         if (requestId == null || requestId.trim().isEmpty()) {
@@ -34,7 +35,7 @@ public class RequestIdInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, Exception ex) {
         // 清理ThreadLocal，避免内存泄漏
         REQUEST_ID.remove();
     }

@@ -27,9 +27,8 @@ public class ResultPathAspect {
         Object result = joinPoint.proceed();
         
         // 如果返回值是Result类型，自动设置路径和请求ID
-        if (result instanceof Result) {
-            Result<?> resultObj = (Result<?>) result;
-            
+        if (result instanceof Result<?> resultObj) {
+
             // 设置请求路径
             String path = getCurrentRequestPath();
             if (path != null) {
