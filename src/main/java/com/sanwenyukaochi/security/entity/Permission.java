@@ -14,7 +14,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_permissions")
+@Table(name = "sys_permissions",
+        uniqueConstraints = {@UniqueConstraint(name = "uk_permission_code", columnNames = "code")}
+)
 @EntityListeners(AuditingEntityListener.class)
 @Comment("权限表")
 public class Permission  extends BaseEntity {

@@ -16,9 +16,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_users", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_user_username", columnNames = "user_name")
-})
+@Table(name = "sys_users",
+        indexes = {@Index(name = "uk_user_username", columnList = "user_name, tenant_id", unique = true)}
+)
 @EntityListeners(AuditingEntityListener.class)
 @Comment("用户表")
 public class User extends BaseEntity{

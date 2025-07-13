@@ -11,9 +11,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Comment("用户角色关联表")
 @Table(name = "sys_user_roles",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_user_role", columnNames = {"user_id", "role_id"})
-        }
+        indexes = {@Index(name = "uk_user_role", columnList = "user_id, role_id", unique = true)}
 )
 public class UserRole extends BaseIdEntity {
 

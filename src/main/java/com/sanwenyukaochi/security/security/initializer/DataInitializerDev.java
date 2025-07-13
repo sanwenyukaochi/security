@@ -31,11 +31,11 @@ public class DataInitializerDev implements CommandLineRunner {
 
         // 创建租户
         Long creatorId = snowflake.nextId();
-        Tenant tenant = createTenant(snowflake.nextId(), "测试组", "test_group", true, creatorId, creatorId);
+        Tenant tenant = createTenant(snowflake.nextId(), "系统管理员组", "system_group", true, creatorId, creatorId);
 
         // 创建默认管理员用户
         Long adminId = snowflake.nextId();
-        User defaultAdmin = createUser(adminId, "adminadmin", "12345678", "admin@example.com", "13800138001", true, true, true, true , tenant, adminId, adminId);
+        User defaultAdmin = createUser(adminId, "admin", "123456", "admin@example.com", "13800138001", true, true, true, true , tenant, adminId, adminId);
 
         // 创建其他用户
         User userTenant = createUser(snowflake.nextId(), "tenant", "123456", "tenant@example.com", "13800138002", true, true, true, true, tenant, adminId, adminId);
