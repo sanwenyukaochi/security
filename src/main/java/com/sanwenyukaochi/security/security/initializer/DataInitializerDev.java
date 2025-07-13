@@ -92,7 +92,7 @@ public class DataInitializerDev implements CommandLineRunner {
                     User newUser = new User();
                     newUser.setId(id);
                     newUser.setTenant(tenant);
-                    newUser.setTenantId(tenant.getId());
+                    newUser.setTenantId(tenant.getId().toString());
                     newUser.setUserName(username);
                     newUser.setPassword(passwordEncoder.encode(password));
                     newUser.setEmail(email);
@@ -113,7 +113,7 @@ public class DataInitializerDev implements CommandLineRunner {
                     Role newRole = new Role();
                     newRole.setId(id);
                     newRole.setTenant(tenant);
-                    newRole.setTenantId(tenant.getId());
+                    newRole.setTenantId(tenant.getId().toString());
                     newRole.setName(name);
                     newRole.setCode(code);
                     newRole.setDataScope(dataScope);
@@ -129,7 +129,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 .orElseGet(() -> {
                     Permission newPermission = new Permission();
                     newPermission.setId(id);
-                    newPermission.setTenantId(tenant.getId());
+                    newPermission.setTenantId(tenant.getId().toString());
                     newPermission.setParentId(parentId);
                     newPermission.setType(type);
                     newPermission.setName(name);
@@ -148,7 +148,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 .orElseGet(() -> {
                     UserRole newUserRole = new UserRole();
                     newUserRole.setId(id);
-                    newUserRole.setTenantId(tenant.getId());
+                    newUserRole.setTenantId(tenant.getId().toString());
                     newUserRole.setUser(user);
                     newUserRole.setRole(role);
                     return userRoleRepository.save(newUserRole);
@@ -160,7 +160,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 .orElseGet(() -> {
                     RolePermission newRolePermission = new RolePermission();
                     newRolePermission.setId(id);
-                    newRolePermission.setTenantId(tenant.getId());
+                    newRolePermission.setTenantId(tenant.getId().toString());
                     newRolePermission.setRole(role);
                     newRolePermission.setPermission(permission);
                     return rolePermissionRepository.save(newRolePermission);
