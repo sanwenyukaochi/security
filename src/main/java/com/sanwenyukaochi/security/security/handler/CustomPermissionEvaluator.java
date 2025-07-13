@@ -37,7 +37,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         // 检查是否有指定权限
         return userPermissions.contains(permission.toString());
     }
-
+    
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         if (authentication == null || !authentication.isAuthenticated()) {

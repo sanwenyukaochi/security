@@ -2,11 +2,9 @@ package com.sanwenyukaochi.security.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanwenyukaochi.security.vo.Result;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -14,15 +12,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class AccessDeniedHandlerJwt implements AccessDeniedHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccessDeniedHandlerJwt.class);
-
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
-            throws IOException, ServletException {
-        logger.error("权限不足: {}", accessDeniedException.getMessage());
+            throws IOException {
+        log.error("权限不足: {}", accessDeniedException.getMessage());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -6,8 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.firewall.RequestRejectedException;
@@ -16,20 +15,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @Order(1)
 public class RequestRejectedExceptionFilter extends OncePerRequestFilter {
-
-    private static final Logger logger = LoggerFactory.getLogger(RequestRejectedExceptionFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            logger.info("RequestRejectedExceptionFilter 处理请求: {}", request.getRequestURI());
+            log.info("RequestRejectedExceptionFilter 处理请求: {}", request.getRequestURI());
             filterChain.doFilter(request, response);
         } catch (RequestRejectedException e) {
-            logger.warn("请求被拒绝: {}", e.getMessage());
+            log.warn("请求被拒绝: {}", e.getMessage());
             
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -48,7 +46,7 @@ public class RequestRejectedExceptionFilter extends OncePerRequestFilter {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getOutputStream(), result);
         } catch (Exception e) {
-            logger.error("RequestRejectedExceptionFilter 捕获到未预期的异常: {}", e.getMessage(), e);
+            log.error("RequestRejectedExceptionFilter 捕获到未预期的异常: {}", e.getMessage(), e);
             throw e;
         }
     }
