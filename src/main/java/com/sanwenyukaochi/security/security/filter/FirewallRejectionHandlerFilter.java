@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.security.filter;
 
+import cn.hutool.http.HttpStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanwenyukaochi.security.vo.Result;
 import jakarta.servlet.FilterChain;
@@ -40,7 +41,7 @@ public class FirewallRejectionHandlerFilter extends OncePerRequestFilter {
             }
 
             // 使用统一的Result格式
-            Result<Object> result = Result.error(400, "非法请求路径")
+            Result<Object> result = Result.error(HttpStatus.HTTP_BAD_REQUEST, "非法请求路径", null)
                     .path(request.getRequestURI())
                     .requestId(requestId);
 
