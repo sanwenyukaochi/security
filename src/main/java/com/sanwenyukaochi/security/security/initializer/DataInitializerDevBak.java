@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Profile({"dev"})
 @RequiredArgsConstructor
 @Slf4j
-public class DataInitializerDev implements CommandLineRunner {
+public class DataInitializerDevBak implements CommandLineRunner {
 
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
@@ -32,11 +32,14 @@ public class DataInitializerDev implements CommandLineRunner {
 
         // 1. 创建管理员组租户
         Long creatorId = snowflake.nextId();
-        Tenant adminTenant = createTenant(snowflake.nextId(), "管理员组", "admin_group", true, creatorId, creatorId);
+        Long l = snowflake.nextId();
+        Tenant adminTenant = createTenant(l, "管理员组", "admin_group", true, creatorId, creatorId,l.toString());
 
         // 2. 创建租户A和租户B
-        Tenant tenantA = createTenant(snowflake.nextId(), "租户A", "tenant_a", true, creatorId, creatorId);
-        Tenant tenantB = createTenant(snowflake.nextId(), "租户B", "tenant_b", true, creatorId, creatorId);
+        Long la = snowflake.nextId();
+        Long lb = snowflake.nextId();
+        Tenant tenantA = createTenant(la, "租户A", "tenant_a", true, creatorId, creatorId,la.toString());
+        Tenant tenantB = createTenant(lb, "租户B", "tenant_b", true, creatorId, creatorId, lb.toString());
 
         // 3. 创建管理员用户
         Long adminId = snowflake.nextId();
@@ -89,16 +92,16 @@ public class DataInitializerDev implements CommandLineRunner {
         bindRoleAndPermission(snowflake.nextId(), roleUserB, userViewPermission, tenantB);
 
         // 10. 创建视频数据
-        createVideo(snowflake.nextId(), "我的第一个视频", tenantAUser1, adminId);
-        createVideo(snowflake.nextId(), "我的第一个视频", tenantAUser2, adminId);
-        createVideo(snowflake.nextId(), "我的第一个视频", tenantBUser1, adminId);
-        createVideo(snowflake.nextId(), "我的第一个视频", tenantBUser2, adminId);
+//        createVideo(snowflake.nextId(), "我的第一个视频", tenantAUser1, tenantA, adminId, adminId);
+//        createVideo(snowflake.nextId(), "我的第一个视频", tenantAUser2, tenantA, adminId, adminId);
+//        createVideo(snowflake.nextId(), "我的第一个视频", tenantBUser1, tenantB, adminId, adminId);
+//        createVideo(snowflake.nextId(), "我的第一个视频", tenantBUser2, tenantB, adminId, adminId);
 
         // 11. 打印初始化结果
         printInitializationResult(adminTenant, tenantA, tenantB, adminUser, tenantAAdmin, tenantAUser1, tenantAUser2, tenantBAdmin, tenantBUser1, tenantBUser2, roleAdmin, roleTenantA, roleUserA);
     }
 
-    private Tenant createTenant(Long id, String name, String code, Boolean status, Long createdBy, Long updatedBy) {
+    private Tenant createTenant(Long id, String name, String code, Boolean status, Long createdBy, Long updatedBy, String tenantId) {
         return tenantRepository.findByName(name)
                 .orElseGet(() -> {
                     Tenant newTenant = new Tenant();
@@ -108,6 +111,7 @@ public class DataInitializerDev implements CommandLineRunner {
                     newTenant.setStatus(status);
                     newTenant.setCreatedBy(createdBy);
                     newTenant.setUpdatedBy(updatedBy);
+                    newTenant.setTenantId(tenantId);
                     return tenantRepository.save(newTenant);
                 });
     }
@@ -193,14 +197,15 @@ public class DataInitializerDev implements CommandLineRunner {
                 });
     }
 
-    private void createVideo(Long id, String name, User user, Long createdBy) {
+    private void createVideo(Long id, String name, User user, Tenant tenant, Long createdBy, Long updatedBy) {
         videoRepository.findByNameAndCreatedBy(name, user.getId())
                 .orElseGet(() -> {
                     Video newVideo = new Video();
                     newVideo.setId(id);
                     newVideo.setName(name);
+                    newVideo.setTenantId(tenant.getId().toString());
                     newVideo.setCreatedBy(createdBy);
-                    newVideo.setUpdatedBy(createdBy);
+                    newVideo.setUpdatedBy(updatedBy);
                     return videoRepository.save(newVideo);
                 });
     }

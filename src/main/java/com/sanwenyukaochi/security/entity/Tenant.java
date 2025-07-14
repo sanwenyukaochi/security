@@ -3,6 +3,7 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -19,12 +20,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("租户表")
-public class Tenant {
-
-    @Id
-    @Column(name = "id", nullable = false)
-    @Comment("主键ID")
-    private Long id;
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class Tenant extends BaseEntity {
     
     @Column(name = "name", length = 100, nullable = false)
     @Comment("租户名称")
@@ -38,23 +35,4 @@ public class Tenant {
     @Comment("状态（true=启用，false=禁用）")
     private Boolean status = true;
 
-    @CreatedBy
-    @Column(name = "created_by", updatable = false)
-    @Comment("创建者")
-    private Long createdBy;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    @Comment("创建时间")
-    private Long createdAt;
-
-    @LastModifiedBy
-    @Column(name = "updated_by")
-    @Comment("更新者")
-    private Long updatedBy;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    @Comment("更新时间")
-    private Long updatedAt;
 }

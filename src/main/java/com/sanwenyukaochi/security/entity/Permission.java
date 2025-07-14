@@ -3,6 +3,7 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("权限表")
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Permission  extends BaseEntity {
 
     @Column(name = "parent_id", nullable = false)

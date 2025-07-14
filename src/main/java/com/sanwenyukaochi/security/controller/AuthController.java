@@ -1,6 +1,7 @@
 package com.sanwenyukaochi.security.controller;
 
 
+import com.sanwenyukaochi.security.annotation.IgnoreTenantFilter;
 import com.sanwenyukaochi.security.entity.User;
 import com.sanwenyukaochi.security.security.exception.AuthenticationExceptionFactory;
 import com.sanwenyukaochi.security.repository.UserRepository;
@@ -23,6 +24,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -38,8 +40,11 @@ public class AuthController {
     private final PasswordEncoder encoder;
     private final UserPermissionCacheService userPermissionCacheService;
 
+    // @IgnoreTenantFilter()
     @PostMapping("/signin")
     public Result<Map<String,Object>> authenticateUser(@RequestBody LoginRequest loginRequest) {
+
+        System.out.println(loginRequest);
         
         Authentication authentication;
         try {

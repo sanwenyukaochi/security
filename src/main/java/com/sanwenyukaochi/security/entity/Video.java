@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @EqualsAndHashCode(callSuper = true)
@@ -18,6 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("视频表")
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Video extends BaseEntity {
 
     @Column(name = "name", length = 100, nullable = false)

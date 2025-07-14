@@ -3,6 +3,7 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -13,6 +14,7 @@ import org.hibernate.annotations.Comment;
 @Table(name = "sys_user_roles",
         indexes = {@Index(name = "uk_user_role", columnList = "user_id, role_id", unique = true)}
 )
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class UserRole extends BaseIdEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
