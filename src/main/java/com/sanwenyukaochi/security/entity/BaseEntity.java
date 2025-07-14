@@ -20,22 +20,22 @@ import org.springframework.data.annotation.LastModifiedDate;
 public abstract class BaseEntity extends BaseIdEntity{
     
     @CreatedBy
-    @Column(name = "created_by", updatable = false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     @Comment("创建者")
     private Long createdBy;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @Comment("创建时间")
     private Long createdAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", nullable = false)
     @Comment("更新者")
     private Long updatedBy;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     @Comment("更新时间")
     private Long updatedAt;
 }
