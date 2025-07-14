@@ -3,7 +3,6 @@ package com.sanwenyukaochi.security.controller;
 
 import com.sanwenyukaochi.security.entity.User;
 import com.sanwenyukaochi.security.security.exception.AuthenticationExceptionFactory;
-import com.sanwenyukaochi.security.security.exception.CustomAuthenticationException;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.security.jwt.JwtUtils;
 import com.sanwenyukaochi.security.security.request.LoginRequest;
@@ -18,8 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,16 +43,9 @@ public class AuthController {
         
         Authentication authentication;
         try {
-            authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        } catch (AuthenticationException exception) {
-            // 根据异常类型抛出相应的自定义异常
-            if (exception instanceof CustomAuthenticationException) {
-                throw exception; // 直接抛出，因为已经是自定义异常
-            } else {
-                // 其他认证异常（如密码错误）转换为密码错误异常
-                throw AuthenticationExceptionFactory.invalidPassword(loginRequest.getUsername());
-            }
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        } catch (AuthenticationException e) {
+            throw AuthenticationExceptionFactory.resolve(loginRequest.getUsername(), e);
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

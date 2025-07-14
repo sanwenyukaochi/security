@@ -1,37 +1,50 @@
 package com.sanwenyukaochi.security.security.exception;
 
-/**
- * 认证异常工厂 - 简化版本
- * 只保留最常用的异常类型，减少文件数量
- */
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.Map;
+
+
+// TODO 工厂 + 策略 但是考虑一下 username 有没有用，没用可以把 username 删掉
 public class AuthenticationExceptionFactory {
-    
-    /**
-     * 用户不存在
-     */
-    public static CustomAuthenticationException userNotFound(String username) {
-        return new CustomAuthenticationException("用户不存在: " + username, "USER_NOT_FOUND");
+
+    private static final Map<Class<? extends AuthenticationException>, AuthExceptionStrategy> STRATEGY_MAP = Map.of(
+            UsernameNotFoundException.class, (username, e) -> AuthenticationExceptionFactory.authenticationError(401, username, "USER_NOT_FOUND"),
+            BadCredentialsException.class, (username, e) -> AuthenticationExceptionFactory.authenticationError(401, username, "INVALID_PASSWORD"),
+            DisabledException.class, (username, e) -> AuthenticationExceptionFactory.accountStatus(403, username, "DISABLED"),
+            LockedException.class, (username, e) -> AuthenticationExceptionFactory.accountStatus(403, username, "LOCKED"),
+            AccountExpiredException.class, (username, e) -> AuthenticationExceptionFactory.accountStatus(403, username, "EXPIRED"),
+            CredentialsExpiredException.class, (username, e) -> AuthenticationExceptionFactory.accountStatus(403, username, "CREDENTIALS_EXPIRED")
+            
+    );
+
+    public static CustomAuthenticationException resolve(String username, AuthenticationException e) {
+        AuthExceptionStrategy strategy = STRATEGY_MAP.get(e.getClass());
+        if (strategy != null) {
+            return strategy.handle(username, e);
+        }
+        return new CustomAuthenticationException(401, "认证失败: " + e.getMessage(), "AUTH_ERROR");
     }
-    
-    /**
-     * 密码错误
-     */
-    public static CustomAuthenticationException invalidPassword(String username) {
-        return new CustomAuthenticationException("密码错误", "INVALID_PASSWORD");
+
+    public static CustomAuthenticationException authenticationError(Integer code, String username, String errorCode) {
+        String message = switch (errorCode) {
+            case "USER_NOT_FOUND" -> "用户不存在";
+            case "INVALID_PASSWORD" -> "密码错误";
+            default -> "认证失败";
+        };
+        return new CustomAuthenticationException(code ,message, errorCode);
     }
-    
-    /**
-     * 账户状态异常（禁用/锁定/过期等）
-     */
-    public static CustomAuthenticationException accountStatus(String username, String status) {
-        String message = switch (status) {
+
+    public static CustomAuthenticationException accountStatus(Integer code, String username, String errorCode) {
+        String message = switch (errorCode) {
             case "DISABLED" -> "账户已被禁用";
             case "LOCKED" -> "账户已被锁定";
             case "EXPIRED" -> "账户已过期";
             case "CREDENTIALS_EXPIRED" -> "凭据已过期";
             default -> "账户状态异常";
         };
-        
-        return new CustomAuthenticationException(message + ": " + username, status);
+        return new CustomAuthenticationException(code, message, errorCode);
     }
-} 
+}

@@ -24,17 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> AuthenticationExceptionFactory.userNotFound(username));
-
-        // 检查账户状态
-        if (!user.getStatus()) {
-            throw AuthenticationExceptionFactory.accountStatus(username, "DISABLED");
-        }
-
-        if (!user.getAccountNonLocked()) {
-            throw AuthenticationExceptionFactory.accountStatus(username, "LOCKED");
-        }
-
+                .orElseThrow(() -> new UsernameNotFoundException(username));
         return UserDetailsImpl.build(user, userPermissionService, userPermissionCacheService);
     }
     
