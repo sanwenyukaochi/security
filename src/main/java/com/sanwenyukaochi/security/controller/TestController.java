@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.controller;
 
+import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.entity.*;
 import com.sanwenyukaochi.security.repository.*;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
@@ -46,7 +47,7 @@ public class TestController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "用户未认证");
             response.put("status", "error");
-            return Result.error(401,"用户未认证", response);
+            return Result.error(HttpStatus.HTTP_UNAUTHORIZED,"用户未认证", response);
         }
 
         // 使用Repository查询来避免懒加载问题

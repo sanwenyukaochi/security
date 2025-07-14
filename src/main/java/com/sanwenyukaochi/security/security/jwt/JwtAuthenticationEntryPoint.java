@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.security.jwt;
 
+import cn.hutool.http.HttpStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanwenyukaochi.security.vo.Result;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         }
 
         // 使用统一的Result格式
-        Result<String> result = Result.error(401, "认证失败","")
+        Result<String> result = Result.error(HttpStatus.HTTP_UNAUTHORIZED, "认证失败","")
                 .path(request.getRequestURI())
                 .requestId(requestId);
 
