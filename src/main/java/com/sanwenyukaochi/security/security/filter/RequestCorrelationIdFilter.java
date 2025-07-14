@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 @Component
 @Order(1)
-public class RequestIdFilter extends OncePerRequestFilter {
+public class RequestCorrelationIdFilter extends OncePerRequestFilter {
 
     private static final ThreadLocal<String> REQUEST_ID = new ThreadLocal<>();
     private static final String REQUEST_ID_HEADER = "X-Request-ID";

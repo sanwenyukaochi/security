@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.exception;
 
 import com.sanwenyukaochi.security.security.exception.CustomAuthenticationException;
-import com.sanwenyukaochi.security.security.filter.RequestIdFilter;
+import com.sanwenyukaochi.security.security.filter.RequestCorrelationIdFilter;
 import com.sanwenyukaochi.security.vo.Result;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.firewall.RequestRejectedException;
@@ -97,7 +97,7 @@ public class MyGlobalExceptionHandler {
     private String getRequestId() {
         try {
             // 优先从RequestIdFilter获取
-            String requestId = RequestIdFilter.getCurrentRequestId();
+            String requestId = RequestCorrelationIdFilter.getCurrentRequestId();
             if (requestId != null && !requestId.trim().isEmpty()) {
                 return requestId;
             }

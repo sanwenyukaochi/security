@@ -1,6 +1,6 @@
 package com.sanwenyukaochi.security.aspect;
 
-import com.sanwenyukaochi.security.security.filter.RequestIdFilter;
+import com.sanwenyukaochi.security.security.filter.RequestCorrelationIdFilter;
 import com.sanwenyukaochi.security.vo.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Optional;
 
 
 /**
@@ -25,23 +26,12 @@ public class ResultPathAspect {
     @Around("execution(* com.sanwenyukaochi.security.controller.*.*(..))")
     public Object setResultPath(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = joinPoint.proceed();
-        
-        // 如果返回值是Result类型，自动设置路径和请求ID
-        if (result instanceof Result<?> resultObj) {
-
-            // 设置请求路径
-            String path = getCurrentRequestPath();
-            if (path != null) {
-                resultObj.setPath(path);
-            }
-            
-            // 设置请求ID
-            String requestId = RequestIdFilter.getCurrentRequestId();
-            if (requestId != null) {
-                resultObj.setRequestId(requestId);
-            }
+        if (result instanceof Result<?> res) {
+            Optional.ofNullable(getCurrentRequestPath())
+                    .ifPresent(res::setPath);
+            Optional.ofNullable(RequestCorrelationIdFilter.getCurrentRequestId())
+                    .ifPresent(res::setRequestId);
         }
-        
         return result;
     }
 

@@ -18,7 +18,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @Order(1)
-public class RequestRejectedExceptionFilter extends OncePerRequestFilter {
+public class FirewallRejectionHandlerFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
