@@ -1,8 +1,7 @@
 package com.sanwenyukaochi.security.security.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.sanwenyukaochi.security.entity.Tenant;
 import com.sanwenyukaochi.security.entity.User;
@@ -45,38 +44,15 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-
-//    public UserDetailsImpl(Long id,SysTenant tenant, String username, String password, String email, String phone,
-//                           Boolean status, Boolean accountNonExpired, Boolean accountNonLocked, Boolean credentialsNonExpired,
-//                           Collection<? extends GrantedAuthority> authorities) {
-//        this.id = id;
-//        this.username = username;
-//        this.email = email;
-//        this.phone = phone;
-//        this.tenant = tenant;
-//        this.password = password;
-//        this.authorities = authorities;
-//        this.accountNonExpired = accountNonExpired;
-//        this.accountNonLocked = accountNonLocked;
-//        this.credentialsNonExpired = credentialsNonExpired;
-//        this.status = status;
-//    }
-    
-    public static UserDetailsImpl build(User user, UserPermissionService userPermissionService) {
-        return build(user, userPermissionService, null);
-    }
-
     public static UserDetailsImpl build(User user, UserPermissionService userPermissionService, UserPermissionCacheService cacheService) {
-        List<String> authorities;
-        if (cacheService != null) {
-            authorities = cacheService.getUserAuthorities(user.getId());
-        } else {
-            authorities = userPermissionService.getUserAuthorities(user.getId());
-        }
+        List<String> authorityCodes = Optional.ofNullable(cacheService)
+                .map(service -> service.getUserAuthorities(user.getId()))
+                .orElseGet(() -> userPermissionService.getUserAuthorities(user.getId()));
         
-        List<GrantedAuthority> grantedAuthorities = authorities.stream()
+        List<GrantedAuthority> grantedAuthorities = Optional.ofNullable(authorityCodes)
+                .orElseGet(Collections::emptyList).stream()
                 .map(SimpleGrantedAuthority::new)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
 
         return new UserDetailsImpl(
                 user.getId(),
@@ -109,32 +85,36 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return this.accountNonExpired != null && this.accountNonExpired;
+        return this.accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.accountNonLocked != null && this.accountNonLocked;
+        return this.accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.credentialsNonExpired != null && this.credentialsNonExpired;
+        return this.credentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.status != null && this.status;
+        return this.status;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o)
-//            return true;
-//        if (o == null || getClass() != o.getClass())
-//            return false;
-//        UserDetailsImpl user = (UserDetailsImpl) o;
-//        return Objects.equals(id, user.id);
-//    }
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof UserDetailsImpl other)) {
+            return false;
+        }
+        return Objects.equals(this.id, other.id);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 }
