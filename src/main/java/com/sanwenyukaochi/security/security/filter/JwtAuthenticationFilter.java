@@ -9,8 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,21 +20,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @Order(2)
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    
-    private final   UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-    
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        logger.debug("AuthTokenFilter 调用 URI: {}", request.getRequestURI());
+        log.debug("AuthTokenFilter 调用 URI: {}", request.getRequestURI());
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
@@ -43,41 +40,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails,
-                                null,
-                                userDetails.getAuthorities());
-                logger.debug("JWT 中的 Roles: {}", userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                log.debug("JWT 中的 Roles: {}", userDetails.getAuthorities());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            logger.error("无法设置用户身份验证：{}", e.getMessage());
+            log.error("无法设置用户身份验证：{}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
     }
 
-//    private String parseJwt(HttpServletRequest request) {
-//        String jwt = jwtUtils.getJwtFromCookies(request);
-//        logger.debug("AuthTokenFilter.java: {}", jwt);
-//        return jwt;
-//    }
-
     private String parseJwt(HttpServletRequest request) {
-        String jwtFromCookie = jwtUtils.getJwtFromCookies(request);
-        if (jwtFromCookie != null) {
-            return jwtFromCookie;
-        }
-
-        String jwtFromHeader = jwtUtils.getJwtFromHeader(request);
-        if (jwtFromHeader != null) {
-            return jwtFromHeader;
-        }
-
-        return null;
+        return jwtUtils.getJwtFromHeader(request);
     }
 }
 

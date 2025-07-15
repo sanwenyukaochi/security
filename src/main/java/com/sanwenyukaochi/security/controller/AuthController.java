@@ -5,6 +5,7 @@ import com.sanwenyukaochi.security.entity.User;
 import com.sanwenyukaochi.security.security.exception.AuthenticationExceptionFactory;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.security.jwt.JwtUtils;
+import com.sanwenyukaochi.security.security.jwt.RSAUtil;
 import com.sanwenyukaochi.security.security.request.LoginRequest;
 import com.sanwenyukaochi.security.security.request.SignupRequest;
 import com.sanwenyukaochi.security.security.response.MessageResponse;
@@ -14,8 +15,6 @@ import com.sanwenyukaochi.security.service.UserPermissionCacheService;
 import com.sanwenyukaochi.security.vo.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -43,7 +42,7 @@ public class AuthController {
         
         Authentication authentication;
         try {
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), RSAUtil.decrypt(loginRequest.getPassword())));
         } catch (AuthenticationException e) {
             throw AuthenticationExceptionFactory.resolve(loginRequest.getUsername(), e);
         }
@@ -52,16 +51,16 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        String token = jwtUtils.generateTokenFromUsername(userDetails.getUsername());
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
-                userDetails.getUsername(), roles, jwtCookie.toString());
+                userDetails.getUsername(), roles);
 
-        return Result.success(Map.of("user", response, "token", jwtCookie.getValue()));
+        return Result.success(Map.of("user", response, "token", token));
     }
 
     @PostMapping("/signup")
@@ -140,9 +139,6 @@ public class AuthController {
 
     @PostMapping("/signout")
     public ResponseEntity<?> signoutUser(){
-        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-                        cookie.toString())
-                .body(new MessageResponse("You've been signed out!"));
+        return ResponseEntity.ok().body(new MessageResponse("You've been signed out!"));
     }
 }

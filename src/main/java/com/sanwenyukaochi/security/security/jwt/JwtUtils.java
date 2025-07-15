@@ -1,44 +1,16 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 
-import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
-import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtils {
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
-    @Value("${spring.app.jwtSecret}")
-    private String jwtSecret;
-
-    @Value("${spring.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
-
-    @Value("${spring.ecom.app.jwtCookieName}")
-    private String jwtCookie;
-
-    public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
-    }
 
     public String getJwtFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
@@ -48,56 +20,35 @@ public class JwtUtils {
         return null;
     }
 
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
-        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt)
-                .path("/api")
-                .maxAge(24 * 60 * 60)
-                .httpOnly(false)
-                .secure(false)
-                .build();
-        return cookie;
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, null)
-                .path("/api")
-                .build();
-        return cookie;
-    }
-
     public String generateTokenFromUsername(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key())
+                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
+                .signWith(RSAUtil.getPrivateKey(), Jwts.SIG.RS256)
                 .compact();
     }
 
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser()
-                        .verifyWith((SecretKey) key())
+                .verifyWith(RSAUtil.getPublicKey())
                 .build().parseSignedClaims(token)
                 .getPayload().getSubject();
     }
 
-    private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(authToken);
+            Jwts.parser().verifyWith(RSAUtil.getPublicKey()).build().parseSignedClaims(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("无效的JWT令牌: {}", e.getMessage());
+            log.error("无效的JWT令牌: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT令牌已过期: {}", e.getMessage());
+            log.error("JWT令牌已过期: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("不支持的JWT令牌: {}", e.getMessage());
+            log.error("不支持的JWT令牌: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT声明字符串为空: {}", e.getMessage());
+            log.error("JWT声明字符串为空: {}", e.getMessage());
         }
         return false;
     }
