@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
@@ -19,38 +18,69 @@ import java.util.Base64;
 @Component
 public class RSAUtil {
 
-	//@Value("${spring.app.rsaPublicKey}")
-	private static String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAptE01Mvg5z8J5cbX3GyVt+LoZEo7RetAmsfmS5lhBolq3vzkm2A1g1cA1PAEQMTvB5KKGT9JnE6G5AO4AmgWKGF3j4ugsCjZpHYUhm44Dz3NbKgEmOQfH0ZU9Evbuwd+Dnwjx/14300QSX11floBBCx1qvMbt/SJ1LIM9ZLQNvxXbAD0DOAMnqshSKEAqvAP2n87wVuUyqsAOH/ZEFUMIpPmNUhGMDI0Sbk5OwQjrU9oqTWiQmgMYcv2bWtrXrd6Kf8OY93bRdX0smmaLgNTqHjuhER01HA3uJndOisMMhWRb8hhrrVjbSRPy/4BfxN75T0WhhS6j7rremZVy9BgAwIDAQAB";
+	private static String PUBLIC_KEY = """
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnSMkGflg+dMngoR5vvs0
+            oPopRLAyw1vOMO9BPMnokuJEFn/JQOn7Jzs3Ezr5/sem1F49kpc4na/kqdyxO/YC
+            cwJMJ4rvZR0UroKFavgZlyarMpT7zYkuKCB8YoCW57edC8oZEGyx16AxkwQvku12
+            ufHCqlyf3MyCLD6BnfwsbHPBjMXVfx2XZBMjJgtAnXLZ0BGd6AZYV/DIvz0BdXd2
+            6IFg76YrPFvv7c2x4eHexV1rnO0Az4coZGvckaiho3ZU8fsgf3PYVei2Lp6TRTQe
+            yGpbc0/deDeKpWXgfWPnI73iYwIdBTfRkNl+7tX+MvneRJbFAtS9275WdMDGxxQ0
+            gwIDAQAB""";
 
-	//@Value("${spring.app.rsaPrivateKey}")
-	private static String PRIVATE_KEY ="MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCm0TTUy+DnPwnlxtfcbJW34uhkSjtF60Cax+ZLmWEGiWre/OSbYDWDVwDU8ARAxO8HkooZP0mcTobkA7gCaBYoYXePi6CwKNmkdhSGbjgPPc1sqASY5B8fRlT0S9u7B34OfCPH/XjfTRBJfXV+WgEELHWq8xu39InUsgz1ktA2/FdsAPQM4AyeqyFIoQCq8A/afzvBW5TKqwA4f9kQVQwik+Y1SEYwMjRJuTk7BCOtT2ipNaJCaAxhy/Zta2tet3op/w5j3dtF1fSyaZouA1OoeO6ERHTUcDe4md06KwwyFZFvyGGutWNtJE/L/gF/E3vlPRaGFLqPuut6ZlXL0GADAgMBAAECggEAQBYoR0YqGXzg1wscm7yFijcck4bnHZXi5HO+mDWNDl9VlOQwCTcdZ99RXPz2jVF7CPw1nLxxEaEjdk6tbxNAy/Oh5J4+Nd8Dugh5GyoV1FkoZcFovroI8NFqys2n1ULsHTF455iLyrHG+4y8yjVWpZ1U+T9bW0ERgIqEqwVjg3OwFzp2QnVmFVh3SdkE7FOa9tg7jYAhjLkB8K+SUd65BHuKZ5A68M0clsLEcD8aa7e37W/JR05Lw8dpkRwikU6/12FXN+67GXMjKKsWcouIhrETFytugJ7e9AtKUIbPyFbjDmB9LZt/zIZZKbuw8a+ML94Rm5OtwEgN0I80VZUhbQKBgQDdFRr2cmDYaTJhpienwHRos1iMds8UJDG6JZBpOy1yI65omc5ps368f+KmoDMCicnk9J+Zal79v3cTddXLcLa0xjSu7Utewn6eyVnVSSouDIXF1mpos04qvM7dnAN0DFQ1W3NvA/naTa75gfx3oMIVWv6welVaGSqVNqTP36pRXQKBgQDBKgb+1vaWvhx8CS+jXHLYO8Or8ZGHrszys3g5bN+LHjuorVbozhqfF+h3SzupNMj59eWV1bn911mOIG/J23QmFEqqCpCvtMUBJLLIiFyumlUGue+bQYydGlrb83N9IUzSiWs0ZpyM2WFcSYoukqtoQ6qYMnay9cZ23dlRH4mA3wKBgQDDGbv4nsl+UZ+HcyTtsjZIq3TKSJLIOIS1vC6r3vBlGL3yS0FQIHoIiWcQGrHJXKWR6prpvWhkz9Gal9N7PFXQRFX7xSdNUaCCKjifs3iIuL5Y77Zp/UpPBt4bzXFyuOqbR8AfyUd18jYmtCKDw5djVzEJtnuaDjl5AocBd2WLdQKBgQCZG+H9n5BHvhs/6dwbxcy2PvEDWnA7Nz/2ZHE4O2cZk3ZAZl1MHQoW7tFxtW1t2owvLUy0rntFjKvMr0NMoil3gYAJNmSnEUdSd69KqmOkdmpM8ZbN3nBBmsFINLlnBr0o6InUOD2Am1HD3/qqndFFzNTs3JsfkRal44U8+x13ywKBgQCMjHoWq2cfN5yjk1UE+GFrQDrMc7fa2MQo1ACAgNNNVVcqfOpoAJnZV8lLLUrPJOT566J387ULgjvRvazRAWsNoRIF7mjBv39oyq97b1f78a3YpYvUrjdKGixeH0NdWsJzPds4xY/fHTnkal4b09hM/NyRlYyFn6v6GREnRfTbEA=="; 
+	private static String PRIVATE_KEY = """
+            MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdIyQZ+WD50yeC
+            hHm++zSg+ilEsDLDW84w70E8yeiS4kQWf8lA6fsnOzcTOvn+x6bUXj2Slzidr+Sp
+            3LE79gJzAkwniu9lHRSugoVq+BmXJqsylPvNiS4oIHxigJbnt50LyhkQbLHXoDGT
+            BC+S7Xa58cKqXJ/czIIsPoGd/Cxsc8GMxdV/HZdkEyMmC0CdctnQEZ3oBlhX8Mi/
+            PQF1d3bogWDvpis8W+/tzbHh4d7FXWuc7QDPhyhka9yRqKGjdlTx+yB/c9hV6LYu
+            npNFNB7IaltzT914N4qlZeB9Y+cjveJjAh0FN9GQ2X7u1f4y+d5ElsUC1L3bvlZ0
+            wMbHFDSDAgMBAAECggEAO0sq0LhGrQ5N3tSRQgz1T3cGAnrANPJb7CAjzEXeAirq
+            CVlfviRsVmHkRtfexJJes8z5y+pO/UWFcckqgZczVmV8CgHFkrB2AOGUaYhD08LO
+            H9CS8Xw9k/uqI9sk1jv1QSEZ8xYox1YVzsVqFDWRstl0nKdF1WHADuTpMQ2aT7OI
+            W96H4EfPiNMVOj04Mjz+RRNUvWbZHzFS/QercuecH9708dVZLarM7pWEnTJNjuSZ
+            WWnPIcVYYKqNkFghLMUDKBIi81tlXE/ajus/T/I8eugpdHWPWAnFmG3/bcaoGoE/
+            k11xVVuqSGscTvI2dp6zsmvnWCLzYIMowU5cFvtbXQKBgQDap7pmxtAs+h9dwX6G
+            VxbplVs3R8noQExMii+g028jW2xUN5l3Xp40S0A5WaPeAmuevHjEwz+k+P0Arsgd
+            4a168kfusXVbZ6d8jF5a2sz69R8+Tbcz6HOz6KM/Dh6uMXO+YOkQSl3OBYyMaXE8
+            We4kxGQ2GQ4dDU9wMhjP70WpLwKBgQC3+altcDA5lQFI+p+S+qMs+BNZKniBUVMQ
+            lDN7wnWnVIH1vAblHvGIizg+8RaUc5rogEBNoUlReJn8+j1PVIxZmhzY0E3ewUiP
+            lW0+eYgnPCBxvgJBP6D/bIAMRl+4O6qK+88OgzMA4Ky4xufy/EGmblwlCvN2alA5
+            Q10xWAWs7QKBgHq/hEYkQEOvmqIweM4D4An7Xby34WIvjmW9gaVgbNjFfxf8Knw3
+            ssqaoBBSAUslwrLXDVkwXu9HFAkpFZCo25HUp4sZNk+87epehq2sfTw5FXQNftZ2
+            HVYXOGWykIirnFV44/3QMb7xoIhGvVnrBmS/l55DDIhEq57JkOJSaaHjAoGADUrF
+            efm0EkT4vcwVwWnIZlRaGYQfBsDYboc2nQd0tq09YoK+QMmWi9X7L1j916XumEPD
+            4Zf4kyFShtuRmGy0YzjmQqfyKFjwpCcYqH3hX2xRr8YZpZsyR6IQMlLXUZlF/hqp
+            YBQMmFCjSgpc8cpV9+9bSvXal0ChITIDxq/kYRUCgYEAoxSSU5Pe0yo1/BGngzv7
+            nrMVefQa6wYtvkboZdpS9Fr/LPkkO6gWRIqvCxy9LXEpVkwccWtAYsJexYS2rcGj
+            sD458rCsuK6anF+T2/1Pmeh06WIqwen9hEnMBelPhi1hw+VAgfBSJhxLUdKSU3KT
+            Gqe4cKWXxvpndvuGlbNtV+s=""";
 
 	public static String getPublicKeyStr() {
-		return PUBLIC_KEY;
+		return PUBLIC_KEY.replaceAll("\\s", "");
 	}
 
 	public static void setPublicKey(String publicKey) {
-		PUBLIC_KEY = publicKey;
+		PUBLIC_KEY = publicKey.replaceAll("\\s", "");
 	}
 
 	public static String getPrivateKeyStr() {
-		return PRIVATE_KEY;
+		return PRIVATE_KEY.replaceAll("\\s", "");
 	}
 
 	public static void setPrivateKey(String privateKey) {
-		PRIVATE_KEY = privateKey;
+		PRIVATE_KEY = privateKey.replaceAll("\\s", "");
 	}
 
 	@SneakyThrows
 	public static RSAPublicKey getPublicKey() {
-		byte[] decoded = Base64.getDecoder().decode(PUBLIC_KEY);
+		byte[] decoded = Base64.getDecoder().decode(PUBLIC_KEY.replaceAll("\\s", ""));
 		return (RSAPublicKey) KeyFactory.getInstance("RSA")
 				.generatePublic(new X509EncodedKeySpec(decoded));
 	}
 
 	@SneakyThrows
 	public static RSAPrivateKey getPrivateKey() {
-		byte[] decoded = Base64.getDecoder().decode(PRIVATE_KEY);
+		byte[] decoded = Base64.getDecoder().decode(PRIVATE_KEY.replaceAll("\\s", ""));
 		return (RSAPrivateKey) KeyFactory.getInstance("RSA")
 				.generatePrivate(new PKCS8EncodedKeySpec(decoded));
 	}
@@ -68,7 +98,7 @@ public class RSAUtil {
 
 	@SneakyThrows
 	public static String encrypt(String source) {
-		byte[] decoded = Base64.getDecoder().decode(PUBLIC_KEY);
+		byte[] decoded = Base64.getDecoder().decode(PUBLIC_KEY.replaceAll("\\s", ""));
 		RSAPublicKey rsaPublicKey = (RSAPublicKey) KeyFactory.getInstance("RSA")
 				.generatePublic(new X509EncodedKeySpec(decoded));
 		Cipher cipher = Cipher.getInstance("RSA");
@@ -78,7 +108,7 @@ public class RSAUtil {
 
 	@SneakyThrows
 	public static Cipher getCipher() {
-		byte[] decoded = Base64.getDecoder().decode(PRIVATE_KEY);
+		byte[] decoded = Base64.getDecoder().decode(PRIVATE_KEY.replaceAll("\\s", ""));
 		RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA")
 				.generatePrivate(new PKCS8EncodedKeySpec(decoded));
 		Cipher cipher = Cipher.getInstance("RSA");

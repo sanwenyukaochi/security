@@ -36,7 +36,6 @@ public class JwtUtils {
                 .getPayload().getSubject();
     }
 
-
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser().verifyWith(RSAUtil.getPublicKey()).build().parseSignedClaims(authToken);
