@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @ControllerAdvice
-public class ResultResponseAdvice implements ResponseBodyAdvice<Object> {
+public class ResultStatusAdvice implements ResponseBodyAdvice<Object> {
+
     @Override
     public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
         return true;
