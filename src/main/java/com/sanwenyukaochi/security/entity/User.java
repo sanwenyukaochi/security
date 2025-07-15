@@ -22,10 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @EntityListeners(AuditingEntityListener.class)
 @Comment("用户表")
 public class User extends BaseEntity{
-    
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tenant", nullable = false, 
-        foreignKey = @ForeignKey(name = "fk_user_tenant"))
+    @JoinColumn(name = "tenant", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_user_tenant"))
     @Comment("租户信息")
     private Tenant tenant;
 
@@ -50,11 +50,11 @@ public class User extends BaseEntity{
     @Column(name = "status", nullable = false)
     @Comment("状态（true=启用，false=禁用）")
     private Boolean status = true;
-    
+
     @Column(name = "account_non_expired", nullable = false)
     @Comment("账户是否未过期（true=有效，false=过期）")
     private Boolean accountNonExpired = true;
-    
+
     @Column(name = "account_non_locked", nullable = false)
     @Comment("账户是否未锁定（true=正常，false=锁定）")
     private Boolean accountNonLocked = true;
@@ -63,7 +63,6 @@ public class User extends BaseEntity{
     @Comment("密码是否未过期（true=有效，false=已过期）")
     private Boolean credentialsNonExpired = true;
 
-    // 用户角色关联
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<UserRole> userRoles = new ArrayList<>();

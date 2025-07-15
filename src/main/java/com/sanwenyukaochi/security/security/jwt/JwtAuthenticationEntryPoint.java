@@ -32,7 +32,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         }
 
         // 使用统一的Result格式
-        Result<String> result = Result.error(HttpStatus.HTTP_UNAUTHORIZED, "认证失败","")
+        Result<Object> result = Result.error(HttpStatus.HTTP_UNAUTHORIZED, "认证失败",null)
                 .path(request.getRequestURI())
                 .requestId(requestId);
 

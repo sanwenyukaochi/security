@@ -18,7 +18,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @AllArgsConstructor
 @MappedSuperclass
 public abstract class BaseEntity extends BaseIdEntity{
-    
+
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     @Comment("创建者")

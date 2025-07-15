@@ -16,8 +16,8 @@ import org.hibernate.annotations.Comment;
 public class UserRole extends BaseIdEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false,
-        foreignKey = @ForeignKey(name = "fk_user_role_user_id"))
+    @JoinColumn(name = "user_id", nullable = false, 
+            foreignKey = @ForeignKey(name = "fk_user_role_user_id"))
     @Comment("用户ID")
     private User user;
 

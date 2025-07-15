@@ -31,7 +31,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         }
 
         // 使用统一的Result格式
-        Result<String> result = Result.error(403, "权限不足", "")
+        Result<Object> result = Result.error(403, "权限不足", null)
                 .path(request.getRequestURI())
                 .requestId(requestId);
 
