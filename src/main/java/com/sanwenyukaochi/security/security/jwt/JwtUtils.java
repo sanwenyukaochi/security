@@ -1,6 +1,7 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 
+import com.sanwenyukaochi.security.model.JwtTokenPair;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,45 @@ public class JwtUtils {
         return null;
     }
 
+    public JwtTokenPair generateTokenPairFromUsername(String username) {
+        String accessToken = generateTokenFromUsername(username);
+        String refreshToken = generateRefreshToken(username);
+        JwtTokenPair jwtTokenPair = new JwtTokenPair();
+        jwtTokenPair.setAccessToken(accessToken);
+        jwtTokenPair.setRefreshToken(refreshToken);
+        return jwtTokenPair;
+    }
+
     public String generateTokenFromUsername(String username) {
+        long expirationMs = 24 * 60 * 60 * 1000;
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(RSAUtil.getPrivateKey(), Jwts.SIG.RS256)
                 .compact();
+    }
+    
+    public String generateRefreshToken(String username) {
+        long refreshExpirationMs = 7L * 24 * 60 * 60 * 1000;
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + refreshExpirationMs))
+                .signWith(RSAUtil.getPrivateKey(), Jwts.SIG.RS256)
+                .compact();
+    }
+
+    public boolean validateRefreshToken(String token) {
+        return validateJwtToken(token);
+    }
+
+    public String refreshAccessToken(String refreshToken) {
+        if (validateJwtToken(refreshToken)) {
+            String username = getUserNameFromJwtToken(refreshToken);
+            return generateTokenFromUsername(username);
+        }
+        throw new JwtException("Refresh Token 无效或已过期");
     }
 
     public String getUserNameFromJwtToken(String token) {

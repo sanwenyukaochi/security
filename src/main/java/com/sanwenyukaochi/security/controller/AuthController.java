@@ -2,6 +2,7 @@ package com.sanwenyukaochi.security.controller;
 
 
 import com.sanwenyukaochi.security.entity.User;
+import com.sanwenyukaochi.security.model.JwtTokenPair;
 import com.sanwenyukaochi.security.security.exception.AuthenticationExceptionFactory;
 import com.sanwenyukaochi.security.repository.UserRepository;
 import com.sanwenyukaochi.security.security.jwt.JwtUtils;
@@ -38,7 +39,7 @@ public class AuthController {
     private final UserPermissionCacheService userPermissionCacheService;
 
     @PostMapping("/signin")
-    public Result<Map<String,Object>> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public Result<UserInfoResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         
         Authentication authentication;
         try {
@@ -51,16 +52,16 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        String token = jwtUtils.generateTokenFromUsername(userDetails.getUsername());
+        JwtTokenPair stringStringMap = jwtUtils.generateTokenPairFromUsername(userDetails.getUsername());
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
-                userDetails.getUsername(), roles);
+                userDetails.getUsername(), roles, stringStringMap);
 
-        return Result.success(Map.of("user", response, "token", token));
+        return Result.success(response);
     }
 
     @PostMapping("/signup")
