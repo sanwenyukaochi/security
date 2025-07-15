@@ -31,7 +31,19 @@ public class DataInitializerDev implements CommandLineRunner {
 
         // 创建租户
         Long creatorId = snowflake.nextId();
-        Tenant tenant = createTenant(snowflake.nextId(), "系统管理员组", "system_group", true, creatorId, creatorId);
+        Long l = snowflake.nextId();
+        Tenant tenant = tenantRepository.findByName("系统管理员组")
+                .orElseGet(() -> {
+                    Tenant newTenant = new Tenant();
+                    newTenant.setId(l);
+                    newTenant.setTenantId(l);
+                    newTenant.setName("系统管理员组");
+                    newTenant.setCode("system_group");
+                    newTenant.setStatus(true);
+                    newTenant.setCreatedBy(creatorId);
+                    newTenant.setUpdatedBy(creatorId);
+                    return tenantRepository.save(newTenant);
+                });
 
         // 创建默认管理员用户
         Long adminId = snowflake.nextId();
@@ -72,11 +84,12 @@ public class DataInitializerDev implements CommandLineRunner {
         printInitializationResult(tenant, defaultAdmin, userTenant, userUser, roleAdmin, roleTenant, roleUser);
     }
 
-    private Tenant createTenant(Long id, String name, String code, Boolean status, Long createdBy, Long updatedBy) {
+    private Tenant createTenant(Long id, String name, String code, Boolean status, Tenant tenant, Long createdBy, Long updatedBy) {
         return tenantRepository.findByName(name)
                 .orElseGet(() -> {
                     Tenant newTenant = new Tenant();
                     newTenant.setId(id);
+                    newTenant.setTenantId(tenant.getId());
                     newTenant.setName(name);
                     newTenant.setCode(code);
                     newTenant.setStatus(status);
@@ -92,7 +105,7 @@ public class DataInitializerDev implements CommandLineRunner {
                     User newUser = new User();
                     newUser.setId(id);
                     newUser.setTenant(tenant);
-                    newUser.setTenantId(tenant.getId().toString());
+                    newUser.setTenantId(tenant.getId());
                     newUser.setUserName(username);
                     newUser.setPassword(passwordEncoder.encode(password));
                     newUser.setEmail(email);
@@ -113,7 +126,7 @@ public class DataInitializerDev implements CommandLineRunner {
                     Role newRole = new Role();
                     newRole.setId(id);
                     newRole.setTenant(tenant);
-                    newRole.setTenantId(tenant.getId().toString());
+                    newRole.setTenantId(tenant.getId());
                     newRole.setName(name);
                     newRole.setCode(code);
                     newRole.setDataScope(dataScope);
@@ -129,7 +142,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 .orElseGet(() -> {
                     Permission newPermission = new Permission();
                     newPermission.setId(id);
-                    newPermission.setTenantId(tenant.getId().toString());
+                    newPermission.setTenantId(tenant.getId());
                     newPermission.setParentId(parentId);
                     newPermission.setType(type);
                     newPermission.setName(name);
@@ -148,7 +161,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 .orElseGet(() -> {
                     UserRole newUserRole = new UserRole();
                     newUserRole.setId(id);
-                    newUserRole.setTenantId(tenant.getId().toString());
+                    newUserRole.setTenantId(tenant.getId());
                     newUserRole.setUser(user);
                     newUserRole.setRole(role);
                     return userRoleRepository.save(newUserRole);
@@ -160,7 +173,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 .orElseGet(() -> {
                     RolePermission newRolePermission = new RolePermission();
                     newRolePermission.setId(id);
-                    newRolePermission.setTenantId(tenant.getId().toString());
+                    newRolePermission.setTenantId(tenant.getId());
                     newRolePermission.setRole(role);
                     newRolePermission.setPermission(permission);
                     return rolePermissionRepository.save(newRolePermission);

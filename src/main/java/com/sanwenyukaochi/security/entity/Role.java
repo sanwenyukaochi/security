@@ -44,12 +44,10 @@ public class Role extends BaseEntity {
     @Comment("状态（false禁用，true启用）")
     private Boolean status = false;
 
-    // 角色用户关联
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<UserRole> userRoles = new ArrayList<>();
 
-    // 角色权限关联
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<RolePermission> rolePermissions = new HashSet<>();
