@@ -3,7 +3,6 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.Filter;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

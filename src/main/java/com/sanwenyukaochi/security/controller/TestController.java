@@ -3,13 +3,19 @@ package com.sanwenyukaochi.security.controller;
 import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.entity.*;
 import com.sanwenyukaochi.security.repository.*;
+import com.sanwenyukaochi.security.security.filter.RequestCorrelationIdFilter;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import com.sanwenyukaochi.security.service.VideoService;
 import com.sanwenyukaochi.security.vo.Result;
+import com.sanwenyukaochi.security.vo.page.PageVO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/test")
 @RequiredArgsConstructor
@@ -34,6 +41,19 @@ public class TestController {
     private final VideoRepository videoRepository;
     private final VideoService videoService;
 
+    @GetMapping("/queryVideo")
+    public Result<?> getVideo(@RequestParam(defaultValue = "0") int currentPage,
+                              @RequestParam(defaultValue = "6") int size) {
+        log.info("请求追踪ID为: {}", RequestCorrelationIdFilter.getCurrentRequestId());
+        Pageable pageable = PageRequest.of(currentPage, size);
+        Page<Video> allVideo = videoService.findAllVideo(pageable);
+        return Result.success(PageVO.from(allVideo.map(video -> {
+            Map<String, Object> simple = new HashMap<>();
+            simple.put("id", video.getId());
+            simple.put("videoName", video.getFileName() + "." + video.getFileExt());
+            return simple;
+        })));
+    }
     @GetMapping("/public")
     public Result<Map<String, Object>> publicEndpoint(Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
@@ -41,12 +61,6 @@ public class TestController {
         response.put("status", "success");
         // response.put("authentication", authentication);
         return Result.success(response);
-    }
-
-    @GetMapping("/queryVideo")
-    public Result<?> getVideo() {
-        List<Video> allVideo = videoService.findAllVideo();
-        return Result.success(allVideo);
     }
 
     @GetMapping("/user-vo")
@@ -392,8 +406,8 @@ public class TestController {
         response.put("debugInfo", debugInfo);
         return ResponseEntity.ok(response);
     }
-    
-    
+
+
 
     /**
      * 获取当前租户的所有用户

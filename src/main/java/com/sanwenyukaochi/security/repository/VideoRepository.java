@@ -10,23 +10,11 @@ import java.util.Optional;
 @Repository
 public interface VideoRepository extends JpaRepository<Video, Long> {
 
-    /**
-     * 根据名称查找视频
-     */
-    Optional<Video> findByName(String name);
+    Optional<Video> findByFileNameAndFileExt(String fileName, String fileExt);
 
-    /**
-     * 根据创建者查找视频列表
-     */
     List<Video> findByCreatedBy(Long createdBy);
 
-    /**
-     * 根据名称和创建者查找视频
-     */
-    Optional<Video> findByNameAndCreatedBy(String name, Long createdBy);
+    Optional<Video> findByFileNameAndFileExtAndCreatedBy(String fileName, String fileExt, Long createdBy);
 
-    /**
-     * 检查指定名称的视频是否存在
-     */
-    Boolean existsByName(String name);
-} 
+    Boolean existsByFileNameAndFileExt(String fileName, String fileExt);
+}

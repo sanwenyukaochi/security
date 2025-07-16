@@ -28,7 +28,7 @@ public class DataInitializerDev implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        log.info("=== 开始初始化RBAC权限系统 ===");
+        log.info("=== 开始初始化系统 ===");
 
         Long userAdminId = snowflake.nextId();
         // 1. 创建租户
@@ -37,13 +37,13 @@ public class DataInitializerDev implements CommandLineRunner {
         Tenant tenantB = createTenant(snowflake.nextId(), "租户组B", "tenant_group_b", true, userAdminId, userAdminId);
 
         // 2. 创建用户
-        User userAdmin = createUser(userAdminId, "user_admin", "123456", "user_admin@sys.com", "13800000001", true, true, true, true, sysTenant, userAdminId, userAdminId);
-        User userTenantA = createUser(snowflake.nextId(), "user_tenant_a", "123456", "user_tenant_a@a.com", "13800000002", true, true, true, true, tenantA, userAdmin.getId(), userAdmin.getId());
-        User userTenantB = createUser(snowflake.nextId(), "user_tenant_b", "123456", "user_tenant_b@b.com", "13800000003", true, true, true, true, tenantB, userAdmin.getId(), userAdmin.getId());
-        User userAA = createUser(snowflake.nextId(), "user_a_a", "123456", "user_a_a@a.com", "13800000004", true, true, true, true, tenantA, userTenantA.getId(), userTenantA.getId());
-        User userAB = createUser(snowflake.nextId(), "user_a_b", "123456", "user_a_b@a.com", "13800000005", true, true, true, true, tenantA, userTenantA.getId(), userTenantA.getId());
-        User userBA = createUser(snowflake.nextId(), "user_b_a", "123456", "user_b_a@b.com", "13800000006", true, true, true, true, tenantB, userTenantB.getId(), userTenantB.getId());
-        User userBB = createUser(snowflake.nextId(), "user_b_b", "123456", "user_b_b@b.com", "13800000007", true, true, true, true, tenantB, userTenantB.getId(), userTenantB.getId());
+        User userAdmin = createUser(userAdminId, "system_admin", "123456", "system_admin@sys.com", "13800000001", true, true, true, true, sysTenant, userAdminId, userAdminId);
+        User userTenantA = createUser(snowflake.nextId(), "tenant_a_admin", "123456", "tenant_a_admin@a.com", "13800000002", true, true, true, true, tenantA, userAdmin.getId(), userAdmin.getId());
+        User userTenantB = createUser(snowflake.nextId(), "tenant_b_admin", "123456", "tenant_b_admin@b.com", "13800000003", true, true, true, true, tenantB, userAdmin.getId(), userAdmin.getId());
+        User userAA = createUser(snowflake.nextId(), "tenant_a_user_a", "123456", "user_a_a@a.com", "13800000004", true, true, true, true, tenantA, userTenantA.getId(), userTenantA.getId());
+        User userAB = createUser(snowflake.nextId(), "tenant_a_user_b", "123456", "tenant_a_user_b@a.com", "13800000005", true, true, true, true, tenantA, userTenantA.getId(), userTenantA.getId());
+        User userBA = createUser(snowflake.nextId(), "tenant_b_user_a", "123456", "tenant_b_user_a@b.com", "13800000006", true, true, true, true, tenantB, userTenantB.getId(), userTenantB.getId());
+        User userBB = createUser(snowflake.nextId(), "tenant_b_user_b", "123456", "tenant_b_user_b@b.com", "13800000007", true, true, true, true, tenantB, userTenantB.getId(), userTenantB.getId());
 
         // 3. 创建角色
         Role roleAdmin = createRole(snowflake.nextId(), "admin", "系统管理员", 1, true, sysTenant, userAdmin.getId(), userAdmin.getId());
@@ -62,13 +62,13 @@ public class DataInitializerDev implements CommandLineRunner {
         bindUserAndRole(snowflake.nextId(), userBB, roleUserB, tenantB);
 
         // 6. 为每个用户创建一条视频数据
-        createVideoForUser(snowflake.nextId(), "user_admin_video1", sysTenant, userAdmin.getId(), userAdmin.getId());
-        createVideoForUser(snowflake.nextId(), "user_tenant_a_video1", tenantA, userTenantA.getId(), userTenantA.getId());
-        createVideoForUser(snowflake.nextId(), "user_tenant_b_video1", tenantB, userTenantB.getId(), userTenantB.getId());
-        createVideoForUser(snowflake.nextId(), "user_a_a_video1", tenantA, userAA.getId(), userAA.getId());
-        createVideoForUser(snowflake.nextId(), "user_a_b_video1", tenantA, userAB.getId(), userAB.getId());
-        createVideoForUser(snowflake.nextId(), "user_b_a_video1", tenantB, userBA.getId(), userBA.getId());
-        createVideoForUser(snowflake.nextId(), "user_b_b_video1", tenantB, userBB.getId(), userBB.getId());
+        createVideoForUser(snowflake.nextId(), "system_admin_video1", "mp4", sysTenant, userAdmin.getId(), userAdmin.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_admin_video1", "mp4", tenantA, userTenantA.getId(), userTenantA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_admin_video1", "mp4", tenantB, userTenantB.getId(), userTenantB.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_user_a_video1", "mp4", tenantA, userAA.getId(), userAA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_user_b_video1", "mp4", tenantA, userAB.getId(), userAB.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_user_a_video1", "mp4", tenantB, userBA.getId(), userBA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_user_b_video1", "mp4", tenantB, userBB.getId(), userBB.getId());
 
         // 5. 打印初始化结果
         printInitializationResult(sysTenant, tenantA, tenantB, userAdmin, userTenantA, userTenantB, userAA, userAB, userBA, userBB, roleAdmin, roleTenantA, roleTenantB, roleUserA, roleUserB);
@@ -170,12 +170,13 @@ public class DataInitializerDev implements CommandLineRunner {
                 });
     }
 
-    private void createVideoForUser(Long id, String name, Tenant tenant, Long createdBy, Long updatedBy) {
-        videoRepository.findByName(name)
+    private void createVideoForUser(Long id, String fileName, String fileExt, Tenant tenant, Long createdBy, Long updatedBy) {
+        videoRepository.findByFileNameAndFileExt(fileName, fileExt)
                 .orElseGet(() -> {
                     Video video = new Video();
                     video.setId(id);
-                    video.setName(name);
+                    video.setFileName(fileName);
+                    video.setFileExt(fileExt);
                     video.setTenantId(tenant.getId());
                     video.setCreatedBy(createdBy);
                     video.setUpdatedBy(updatedBy);
@@ -184,7 +185,7 @@ public class DataInitializerDev implements CommandLineRunner {
     }
 
     private void printInitializationResult(Tenant sysTenant, Tenant tenantA, Tenant tenantB, User userAdmin, User userTenantA, User userTenantB, User userAA, User userAB, User userBA, User userBB, Role roleAdmin, Role roleTenantA, Role roleTenantB, Role roleUserA, Role roleUserB) {
-        log.info("=== RBAC权限系统初始化完成 ===");
+        log.info("=== 系统初始化完成 ===");
         log.info("系统管理组: {} (ID: {})", sysTenant.getName(), sysTenant.getId());
         log.info("  └─ 用户: {} (角色: {})", userAdmin.getUserName(), roleAdmin.getName());
         log.info("租户组A: {} (ID: {})", tenantA.getName(), tenantA.getId());

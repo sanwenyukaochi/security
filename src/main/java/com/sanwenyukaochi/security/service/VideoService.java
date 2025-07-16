@@ -5,9 +5,9 @@ import com.sanwenyukaochi.security.entity.Video;
 import com.sanwenyukaochi.security.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -17,7 +17,7 @@ public class VideoService {
     private final VideoRepository videoRepository;
     
     @DataScope
-    public List<Video> findAllVideo() {
-        return videoRepository.findAll();
+    public Page<Video> findAllVideo(Pageable pageable) {
+        return videoRepository.findAll(pageable);
     }
 }

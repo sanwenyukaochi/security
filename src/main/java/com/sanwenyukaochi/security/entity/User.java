@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.Filter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @Entity
 @Table(name = "sys_users",
-        indexes = {@Index(name = "uk_user_username", columnList = "created_by, user_name, tenant_id", unique = true)}
+        indexes = {@Index(name = "uk_user_username", columnList = "created_by, user_name", unique = true)}
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("用户表")

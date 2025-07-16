@@ -3,7 +3,6 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.Filter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @Entity
 @Table(name = "sys_roles",
-        indexes = {@Index(name = "uk_role_code", columnList = "created_by, code, tenant_id", unique = true)}
+        indexes = {@Index(name = "uk_role_code", columnList = "created_by, code", unique = true)}
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("角色表")
