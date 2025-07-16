@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.sanwenyukaochi.security.entity.Tenant;
 import com.sanwenyukaochi.security.entity.User;
+import com.sanwenyukaochi.security.entity.Role;
 import com.sanwenyukaochi.security.service.UserPermissionService;
 import com.sanwenyukaochi.security.service.UserPermissionCacheService;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,8 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
+    private List<Role> roles;
+
     public static UserDetailsImpl build(User user, UserPermissionService userPermissionService, UserPermissionCacheService cacheService) {
         List<String> authorityCodes = Optional.ofNullable(cacheService)
                 .map(service -> service.getUserAuthorities(user.getId()))
@@ -54,6 +57,11 @@ public class UserDetailsImpl implements UserDetails {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
+        List<Role> roles = user.getRoles();
+        roles.forEach(role -> {
+            role.getId();
+            role.getDataScope();
+        });
         return new UserDetailsImpl(
                 user.getId(),
                 user.getTenant(),
@@ -65,7 +73,9 @@ public class UserDetailsImpl implements UserDetails {
                 user.getAccountNonExpired(),
                 user.getAccountNonLocked(),
                 user.getCredentialsNonExpired(),
-                grantedAuthorities);
+                grantedAuthorities,
+                roles
+        );
     }
 
     @Override

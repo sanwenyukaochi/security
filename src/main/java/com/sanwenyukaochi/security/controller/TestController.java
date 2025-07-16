@@ -4,6 +4,7 @@ import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.entity.*;
 import com.sanwenyukaochi.security.repository.*;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
+import com.sanwenyukaochi.security.service.VideoService;
 import com.sanwenyukaochi.security.vo.Result;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,14 +32,21 @@ public class TestController {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final VideoRepository videoRepository;
+    private final VideoService videoService;
 
     @GetMapping("/public")
     public Result<Map<String, Object>> publicEndpoint(Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "这是公开接口，任何人都可以访问");
         response.put("status", "success");
-        response.put("authentication", authentication);
+        // response.put("authentication", authentication);
         return Result.success(response);
+    }
+
+    @GetMapping("/queryVideo")
+    public Result<?> getVideo() {
+        List<Video> allVideo = videoService.findAllVideo();
+        return Result.success(allVideo);
     }
 
     @GetMapping("/user-vo")

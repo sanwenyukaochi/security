@@ -3,6 +3,7 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class Role extends BaseEntity {
     private String code;
 
     @Column(name = "data_scope")
-    @Comment("数据权限（0=租户,1=本人,3=自定义）")
+    @Comment("数据权限（1=系统管理员,2=租户,3=普通用户,4=自定义）")
     private Integer dataScope;
 
     @Column(name = "status", nullable = false)

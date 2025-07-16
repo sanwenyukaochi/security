@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -17,6 +20,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
+@FilterDef(name = "createdByFilter", parameters = @ParamDef(name = "createdBy", type = Long.class))
+@Filter(name = "createdByFilter", condition = "created_by = :createdBy")
 public abstract class BaseEntity extends BaseIdEntity{
 
     @CreatedBy

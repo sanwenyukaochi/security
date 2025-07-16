@@ -3,16 +3,17 @@ package com.sanwenyukaochi.security.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Comment("用户角色关联表")
 @Table(name = "sys_user_roles",
         indexes = {@Index(name = "uk_user_role", columnList = "user_id, role_id", unique = true)}
 )
+@Comment("用户角色关联表")
 public class UserRole extends BaseIdEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

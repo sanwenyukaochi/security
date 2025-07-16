@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -71,5 +72,20 @@ public class User extends BaseEntity{
         this.userName = userName;
         this.email = email;
         this.password = password;
+    }
+
+    /**
+     * 获取用户所有角色
+     */
+    public List<Role> getRoles() {
+        List<Role> roles = new ArrayList<>();
+        if (userRoles != null) {
+            for (UserRole ur : userRoles) {
+                if (ur.getRole() != null) {
+                    roles.add(ur.getRole());
+                }
+            }
+        }
+        return roles;
     }
 }
