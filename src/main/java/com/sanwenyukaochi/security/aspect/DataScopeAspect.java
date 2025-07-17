@@ -15,7 +15,6 @@ import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Aspect
@@ -32,19 +31,19 @@ public class DataScopeAspect {
             return joinPoint.proceed();
         }
 
-        Long tenantId = user.getTenant() != null ? user.getTenant().getId() : null;
+        Long tenantId = user.getTenant().getId();
         Long userId = user.getId();
         int dataScopeCode = user.getRoles().stream().mapToInt(Role::getDataScope).min().orElse(1);
-        DataScopeEnum scope = DataScopeEnum.from(dataScopeCode);
 
-        String tenantField = StringUtils.hasText(dataScope.tenantId()) ? dataScope.tenantId() : "tenant_id";
-        String userField = StringUtils.hasText(dataScope.userid()) ? dataScope.userid() : "created_by";
+        String tenantField = dataScope.tenantProperty();
+        String userProperty = dataScope.userProperty();
 
         Session session = getSession();
         try {
-            switch (scope) {
+            switch (DataScopeEnum.from(dataScopeCode)) {
                 case ALL -> {
-                    disableAllFilters(session, "tenantFilter", "createdByFilter");
+                    session.disableFilter("tenantFilter");
+                    session.disableFilter("createdByFilter");
                 }
                 case TENANT -> {
                     if (tenantId == null) throw new IllegalStateException("无租户ID");
@@ -52,15 +51,24 @@ public class DataScopeAspect {
                     session.disableFilter("createdByFilter");
                 }
                 case SELF -> {
+                    if (tenantId == null) throw new IllegalStateException("无租户ID");
                     if (userId == null) throw new IllegalStateException("无用户ID");
-                    session.enableFilter("createdByFilter").setParameter(userField, userId);
-                    session.disableFilter("tenantFilter");
+                    session.enableFilter("tenantFilter").setParameter(tenantField, tenantId);
+                    session.enableFilter("createdByFilter").setParameter(userProperty, userId);
                 }
             }
             return joinPoint.proceed();
         } finally {
             disableAllFilters(session, "tenantFilter", "createdByFilter");
         }
+    }
+
+    private Session getSession() {
+        EntityManager em = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManager.getEntityManagerFactory());
+        if (em == null) {
+            em = entityManager;
+        }
+        return em.unwrap(Session.class);
     }
 
     private void disableAllFilters(Session session, String... filters) {
@@ -71,14 +79,6 @@ public class DataScopeAspect {
                 // 若未开启的filter调用disable会抛异常，忽略即可
             }
         }
-    }
-
-    private Session getSession() {
-        EntityManager em = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManager.getEntityManagerFactory());
-        if (em == null) {
-            em = entityManager;
-        }
-        return em.unwrap(Session.class);
     }
 
 }

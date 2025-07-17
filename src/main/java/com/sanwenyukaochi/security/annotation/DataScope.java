@@ -6,6 +6,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface DataScope {
-    String tenantId() default "tenantId";
-    String userid() default "createdBy";
+    String tenantProperty() default "tenantId";
+    String userProperty() default "createdBy";
 }
