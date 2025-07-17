@@ -41,7 +41,14 @@ dependencies {
         runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
     }
 
-    implementation 'cn.hutool:hutool-all:5.8.24'
+    dependencies {
+        implementation 'cn.hutool:hutool-all:5.8.24'
+    }
+
+    dependencies {
+        implementation 'com.pig4cloud.plugin:easy-captcha:2.2.5'
+        implementation 'com.github.whvcse:easy-captcha:1.6.2'
+    }
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

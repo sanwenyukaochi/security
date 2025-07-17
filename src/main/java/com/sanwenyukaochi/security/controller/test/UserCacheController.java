@@ -1,4 +1,4 @@
-package com.sanwenyukaochi.security.controller;
+package com.sanwenyukaochi.security.controller.test;
 
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import com.sanwenyukaochi.security.service.UserPermissionCacheService;

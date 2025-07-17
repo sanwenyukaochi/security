@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.security.jwt;
 
+import cn.hutool.crypto.CryptoException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -116,11 +117,14 @@ public class RSAUtil {
 		return cipher;
 	}
 
-	@SneakyThrows
 	public static String decrypt(String text) {
-		Cipher cipher = getCipher();
-		byte[] inputByte = Base64.getDecoder().decode(text.getBytes(StandardCharsets.UTF_8));
-		return new String(cipher.doFinal(inputByte));
+		try {
+			Cipher cipher = getCipher();
+			byte[] inputByte = Base64.getDecoder().decode(text.getBytes(StandardCharsets.UTF_8));
+			return new String(cipher.doFinal(inputByte));
+		} catch (Exception e) {
+			throw new CryptoException("RSA 解密失败", e);
+		}
 	}
 
 	@Data

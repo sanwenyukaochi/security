@@ -31,7 +31,7 @@
 //    @PreAuthorize("hasAuthority('user:view')")
 //    public ResponseEntity<Map<String, Object>> getUserRoles(@PathVariable Long userId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!userRepository.existsById(userId)) {
 //            response.put("message", "用户不存在");
 //            response.put("status", "error");
@@ -42,7 +42,7 @@
 //        response.put("userId", userId);
 //        response.put("roles", roles);
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -53,7 +53,7 @@
 //    @PreAuthorize("hasAuthority('user:view')")
 //    public ResponseEntity<Map<String, Object>> getUserPermissions(@PathVariable Long userId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!userRepository.existsById(userId)) {
 //            response.put("message", "用户不存在");
 //            response.put("status", "error");
@@ -64,7 +64,7 @@
 //        response.put("userId", userId);
 //        response.put("permissions", permissions);
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -75,7 +75,7 @@
 //    @PreAuthorize("hasAuthority('user:view')")
 //    public ResponseEntity<Map<String, Object>> getUserAuthorities(@PathVariable Long userId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!userRepository.existsById(userId)) {
 //            response.put("message", "用户不存在");
 //            response.put("status", "error");
@@ -86,7 +86,7 @@
 //        response.put("userId", userId);
 //        response.put("authorities", authorities);
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -97,13 +97,13 @@
 //    @PreAuthorize("hasAuthority('user:edit')")
 //    public ResponseEntity<Map<String, Object>> assignRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!userRepository.existsById(userId)) {
 //            response.put("message", "用户不存在");
 //            response.put("status", "error");
 //            return ResponseEntity.badRequest().body(response);
 //        }
-//        
+//
 //        if (!roleRepository.existsById(roleId)) {
 //            response.put("message", "角色不存在");
 //            response.put("status", "error");
@@ -120,7 +120,7 @@
 //        // 获取用户和角色实体
 //        User user = userRepository.findById(userId).orElse(null);
 //        Role role = roleRepository.findById(roleId).orElse(null);
-//        
+//
 //        if (user == null || role == null) {
 //            response.put("message", "用户或角色不存在");
 //            response.put("status", "error");
@@ -138,7 +138,7 @@
 //
 //        response.put("message", "角色分配成功");
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -149,7 +149,7 @@
 //    @PreAuthorize("hasAuthority('user:edit')")
 //    public ResponseEntity<Map<String, Object>> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!userRepository.existsById(userId)) {
 //            response.put("message", "用户不存在");
 //            response.put("status", "error");
@@ -168,7 +168,7 @@
 //
 //        response.put("message", "角色移除成功");
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -179,13 +179,13 @@
 //    @PreAuthorize("hasAuthority('user:edit')")
 //    public ResponseEntity<Map<String, Object>> assignPermissionToRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!roleRepository.existsById(roleId)) {
 //            response.put("message", "角色不存在");
 //            response.put("status", "error");
 //            return ResponseEntity.badRequest().body(response);
 //        }
-//        
+//
 //        if (!permissionRepository.existsById(permissionId)) {
 //            response.put("message", "权限不存在");
 //            response.put("status", "error");
@@ -202,7 +202,7 @@
 //        // 获取角色和权限实体
 //        Role role = roleRepository.findById(roleId).orElse(null);
 //        Permission permission = permissionRepository.findById(permissionId).orElse(null);
-//        
+//
 //        if (role == null || permission == null) {
 //            response.put("message", "角色或权限不存在");
 //            response.put("status", "error");
@@ -220,7 +220,7 @@
 //
 //        response.put("message", "权限分配成功");
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -231,7 +231,7 @@
 //    @PreAuthorize("hasAuthority('user:edit')")
 //    public ResponseEntity<Map<String, Object>> removePermissionFromRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        if (!roleRepository.existsById(roleId)) {
 //            response.put("message", "角色不存在");
 //            response.put("status", "error");
@@ -250,7 +250,7 @@
 //
 //        response.put("message", "权限移除成功");
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -261,12 +261,12 @@
 //    @PreAuthorize("hasAuthority('user:edit')")
 //    public ResponseEntity<Map<String, Object>> clearUserCache(@PathVariable Long userId) {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        userPermissionCacheService.clearUserCache(userId);
-//        
+//
 //        response.put("message", "用户权限缓存已清除");
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //
@@ -277,12 +277,12 @@
 //    @PreAuthorize("hasAuthority('user:edit')")
 //    public ResponseEntity<Map<String, Object>> clearAllCache() {
 //        Map<String, Object> response = new HashMap<>();
-//        
+//
 //        userPermissionCacheService.clearAllCache();
-//        
+//
 //        response.put("message", "所有权限缓存已清除");
 //        response.put("status", "success");
-//        
+//
 //        return ResponseEntity.ok(response);
 //    }
 //} 

@@ -24,10 +24,7 @@ public class JwtUtils {
     public JwtTokenPair generateTokenPairFromUsername(String username) {
         String accessToken = generateTokenFromUsername(username);
         String refreshToken = generateRefreshToken(username);
-        JwtTokenPair jwtTokenPair = new JwtTokenPair();
-        jwtTokenPair.setAccessToken(accessToken);
-        jwtTokenPair.setRefreshToken(refreshToken);
-        return jwtTokenPair;
+        return new JwtTokenPair(accessToken, refreshToken);
     }
 
     public String generateTokenFromUsername(String username) {

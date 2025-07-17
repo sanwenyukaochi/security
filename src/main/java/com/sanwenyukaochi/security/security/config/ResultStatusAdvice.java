@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.security.config;
 
+import com.sanwenyukaochi.security.security.filter.RequestCorrelationIdFilter;
 import com.sanwenyukaochi.security.vo.Result;
 import lombok.NonNull;
 import org.springframework.core.MethodParameter;
@@ -9,6 +10,9 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import java.net.URI;
+import java.util.Optional;
 
 @ControllerAdvice
 public class ResultStatusAdvice implements ResponseBodyAdvice<Object> {
@@ -29,6 +33,12 @@ public class ResultStatusAdvice implements ResponseBodyAdvice<Object> {
             } catch (Exception ignored) {
                 response.setStatusCode(HttpStatus.OK);
             }
+
+            URI uri = request.getURI();
+            result.setPath(uri.getPath());
+
+            Optional.ofNullable(RequestCorrelationIdFilter.getCurrentRequestId())
+                    .ifPresent(result::setRequestId);
         }
         return body;
     }
