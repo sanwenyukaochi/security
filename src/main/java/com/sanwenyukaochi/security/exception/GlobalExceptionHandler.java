@@ -4,7 +4,6 @@ import cn.hutool.crypto.CryptoException;
 import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.vo.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.*;
@@ -15,6 +14,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -32,10 +35,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return Result.error(HttpStatus.HTTP_BAD_REQUEST, e.getBindingResult().getFieldErrors().stream()
-                .findFirst()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .orElse("参数验证失败"));
+        Class<?> targetClass = e.getParameter().getParameterType();
+        Map<String, String> errorMap = Arrays.stream(targetClass.getDeclaredFields())
+                .map(Field::getName)
+                .flatMap(fieldName -> e.getBindingResult().getFieldErrors().stream()
+                        .filter(fe -> fe.getField().equals(fieldName))
+                        .map(fe -> Map.entry(fieldName, Optional.ofNullable(fe.getDefaultMessage()).orElse("字段无效"))))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+        String firstErrorMsg = errorMap.values().stream().filter(Objects::nonNull).findFirst().orElse("参数验证失败");
+        return Result.error(HttpStatus.HTTP_BAD_REQUEST, firstErrorMsg, errorMap);
     }
 
     @ExceptionHandler(RequestRejectedException.class)
@@ -62,8 +75,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public Result<Object> handleBadCredentialsException(BadCredentialsException e) {
-        log.warn("用户名或密码错误: {}", e.getMessage(), e);
-        return Result.error(HttpStatus.HTTP_UNAUTHORIZED, "用户名或密码错误");
+        log.warn("密码错误: {}", e.getMessage(), e);
+        return Result.error(HttpStatus.HTTP_UNAUTHORIZED, "密码错误");
     }
 
     @ExceptionHandler(DisabledException.class)

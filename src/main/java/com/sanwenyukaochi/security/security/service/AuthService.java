@@ -1,7 +1,6 @@
 package com.sanwenyukaochi.security.security.service;
 
 import cn.hutool.core.lang.Snowflake;
-import cn.hutool.crypto.CryptoException;
 import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.dto.LoginDTO;
 import com.sanwenyukaochi.security.exception.APIException;
@@ -20,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -46,12 +46,12 @@ public class AuthService {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), RSAUtil.decrypt(loginDTO.getPassword()));
             authentication = authenticationManager.authenticate(authenticationToken);
+        } catch (UsernameNotFoundException e) {
+            throw new UsernameNotFoundException("用户不存在");
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("用户名或密码错误");
+            throw new BadCredentialsException("密码错误");
         } catch (InternalAuthenticationServiceException e) {
             throw new InternalAuthenticationServiceException("用户认证服务异常，请稍后再试");
-        } catch (CryptoException e) {
-            throw new CryptoException("密码解密失败，请检查加密逻辑");
         } catch (AuthenticationServiceException e) {
             throw new AuthenticationServiceException("认证失败");
         } catch (Exception e) {

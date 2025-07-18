@@ -63,6 +63,7 @@ public class User extends BaseEntity{
     @Comment("密码是否未过期（true=有效，false=已过期）")
     private Boolean credentialsNonExpired = true;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<UserRole> userRoles = new ArrayList<>();

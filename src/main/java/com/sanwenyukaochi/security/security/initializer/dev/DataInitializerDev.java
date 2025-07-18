@@ -52,6 +52,13 @@ public class DataInitializerDev implements CommandLineRunner {
         Role roleUserA = createRole(snowflake.nextId(), "user", "普通员工", 3, true, tenantA, userTenantA.getId(), userTenantA.getId());
         Role roleUserB = createRole(snowflake.nextId(), "user", "普通员工", 3, true, tenantB, userTenantB.getId(), userTenantB.getId());
 
+        // 创建权限
+        Permission userManagePermission = createPermission(snowflake.nextId(), "test:user:manage", "用户管理(测试)", "/api/test/user", 1, 0L, "1", true, sysTenant, userAdminId, userAdminId);
+        Permission userViewPermission = createPermission(snowflake.nextId(), "test:user:view", "用户查看(测试)", "/api/test/user/view", 1, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission userAddPermission = createPermission(snowflake.nextId(), "test:user:add", "用户新增(测试)", "/api/test/user/add", 2, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission userEditPermission = createPermission(snowflake.nextId(), "test:user:edit", "用户编辑(测试)", "/api/test/user/edit", 3, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission userDeletePermission = createPermission(snowflake.nextId(), "test:user:delete", "用户删除(测试)", "/api/test/user/delete", 4, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+
         // 4. 绑定用户和角色
         bindUserAndRole(snowflake.nextId(), userAdmin, roleAdmin, sysTenant);
         bindUserAndRole(snowflake.nextId(), userTenantA, roleTenantA, tenantA);
@@ -70,6 +77,19 @@ public class DataInitializerDev implements CommandLineRunner {
         createVideoForUser(snowflake.nextId(), "tenant_b_user_a_video1", "mp4", tenantB, userBA.getId(), userBA.getId());
         createVideoForUser(snowflake.nextId(), "tenant_b_user_b_video1", "mp4", tenantB, userBB.getId(), userBB.getId());
 
+        // 绑定角色和权限
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userManagePermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userViewPermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userAddPermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userEditPermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, userDeletePermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleTenantA, userViewPermission, tenantA);
+        bindRoleAndPermission(snowflake.nextId(), roleTenantA, userEditPermission, tenantA);
+        bindRoleAndPermission(snowflake.nextId(), roleTenantB, userViewPermission, tenantB);
+        bindRoleAndPermission(snowflake.nextId(), roleTenantB, userEditPermission, tenantB);
+        bindRoleAndPermission(snowflake.nextId(), roleUserA, userViewPermission, tenantA);
+        bindRoleAndPermission(snowflake.nextId(), roleUserB, userViewPermission, tenantB);
+        
         // 5. 打印初始化结果
         printInitializationResult(sysTenant, tenantA, tenantB, userAdmin, userTenantA, userTenantB, userAA, userAB, userBA, userBB, roleAdmin, roleTenantA, roleTenantB, roleUserA, roleUserB);
     }

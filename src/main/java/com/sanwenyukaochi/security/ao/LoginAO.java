@@ -16,7 +16,6 @@ public class LoginAO {
     private String username;
     
     @NotBlank(message = "请输入密码")
-    @Size(min = 6, max = 40, message = "密码长度6-40字符")
     private String password;
 
     @NotBlank(message = "请输入验证码Key")

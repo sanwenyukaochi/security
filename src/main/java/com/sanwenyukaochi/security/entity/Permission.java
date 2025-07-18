@@ -49,6 +49,7 @@ public class Permission  extends BaseEntity {
     @Comment("是否可见（true可见，false隐藏）")
     private Boolean visible;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<RolePermission> rolePermissions = new ArrayList<>();

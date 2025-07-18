@@ -47,21 +47,11 @@ public class UserDetailsImpl implements UserDetails {
 
     private List<Role> roles;
 
-    public static UserDetailsImpl build(User user, UserPermissionService userPermissionService, UserPermissionCacheService cacheService) {
-        List<String> authorityCodes = Optional.ofNullable(cacheService)
-                .map(service -> service.getUserAuthorities(user.getId()))
-                .orElseGet(() -> userPermissionService.getUserAuthorities(user.getId()));
-        
+    public static UserDetailsImpl build(User user, List<String> authorityCodes, List<Role> roles) {
         List<GrantedAuthority> grantedAuthorities = Optional.ofNullable(authorityCodes)
                 .orElseGet(Collections::emptyList).stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-
-        List<Role> roles = user.getRoles();
-//        roles.forEach(role -> {
-//            role.getId();
-//            role.getDataScope();
-//        });
         return new UserDetailsImpl(
                 user.getId(),
                 user.getTenant(),

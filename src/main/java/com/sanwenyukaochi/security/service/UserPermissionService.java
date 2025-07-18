@@ -35,7 +35,7 @@ public class UserPermissionService {
      */
     public List<String> getUserPermissionCodes(Long userId) {
         List<UserRole> userRoles = userRoleRepository.findByUser_Id(userId);
-        
+
         return userRoles.stream()
                 .map(UserRole::getRole)
                 .map(role -> rolePermissionRepository.findByRole(role))
@@ -52,14 +52,14 @@ public class UserPermissionService {
     public List<String> getUserAuthorities(Long userId) {
         List<String> roles = getUserRoleCodes(userId);
         List<String> permissions = getUserPermissionCodes(userId);
-        
+
         // 合并角色和权限，角色以ROLE_开头
         List<String> authorities = roles.stream()
                 .map(role -> "ROLE_" + role.toUpperCase())
                 .collect(Collectors.toList());
-        
+
         authorities.addAll(permissions);
-        
+
         return authorities;
     }
 } 

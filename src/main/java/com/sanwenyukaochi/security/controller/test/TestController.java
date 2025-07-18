@@ -1,59 +1,86 @@
-//package com.sanwenyukaochi.security.controller.test;
-//
-//import cn.hutool.http.HttpStatus;
-//import com.sanwenyukaochi.security.entity.*;
-//import com.sanwenyukaochi.security.repository.*;
-//import com.sanwenyukaochi.security.security.filter.RequestCorrelationIdFilter;
-//import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
-//import com.sanwenyukaochi.security.service.VideoService;
-//import com.sanwenyukaochi.security.vo.Result;
-//import com.sanwenyukaochi.security.vo.page.PageVO;
-//import lombok.AllArgsConstructor;
-//import lombok.Getter;
-//import lombok.RequiredArgsConstructor;
-//import lombok.Setter;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.*;
-//import java.util.stream.Collectors;
-//
-//@Slf4j
-//@RestController
-//@RequestMapping("/api/test")
-//@RequiredArgsConstructor
-//@Transactional(readOnly = true)
-//public class TestController {
-//
-//    private final UserRepository userRepository;
-//    private final UserRoleRepository userRoleRepository;
-//    private final RolePermissionRepository rolePermissionRepository;
-//    private final RoleRepository roleRepository;
-//    private final PermissionRepository permissionRepository;
-//    private final VideoRepository videoRepository;
-//    private final VideoService videoService;
-//
-//    @GetMapping("/queryVideo")
-//    public Result<?> getVideo(@RequestParam(defaultValue = "0") int currentPage,
-//                              @RequestParam(defaultValue = "6") int size) {
-//        log.info("请求追踪ID为: {}", RequestCorrelationIdFilter.getCurrentRequestId());
-//        Pageable pageable = PageRequest.of(currentPage, size);
-//        Page<Video> allVideo = videoService.findAllVideo(pageable);
-//        return Result.success(PageVO.from(allVideo.map(video -> {
-//            Map<String, Object> simple = new HashMap<>();
-//            simple.put("id", video.getId());
-//            simple.put("videoName", video.getFileName() + "." + video.getFileExt());
-//            return simple;
-//        })));
-//    }
+package com.sanwenyukaochi.security.controller.test;
+
+import com.sanwenyukaochi.security.entity.*;
+import com.sanwenyukaochi.security.repository.*;
+import com.sanwenyukaochi.security.security.filter.RequestCorrelationIdFilter;
+import com.sanwenyukaochi.security.service.VideoService;
+import com.sanwenyukaochi.security.vo.Result;
+import com.sanwenyukaochi.security.vo.page.PageVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@Slf4j
+@RestController
+@RequestMapping("/api/test")
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@PreAuthorize("hasAuthority('test:user:manage')")
+public class TestController {
+
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final VideoRepository videoRepository;
+    private final VideoService videoService;
+
+    @GetMapping("/queryVideo")
+    public Result<?> getVideo(@RequestParam(defaultValue = "0") int currentPage,
+                              @RequestParam(defaultValue = "6") int size) {
+        log.info("请求追踪ID为: {}", RequestCorrelationIdFilter.getCurrentRequestId());
+        Pageable pageable = PageRequest.of(currentPage, size);
+        Page<Video> allVideo = videoService.findAllVideo(pageable);
+        return Result.success(PageVO.from(allVideo.map(video -> {
+            Map<String, Object> simple = new HashMap<>();
+            simple.put("id", video.getId());
+            simple.put("videoName", video.getFileName() + "." + video.getFileExt());
+            return simple;
+        })));
+    }
+
+    @GetMapping("/user/view")
+    @PreAuthorize("hasAuthority('test:user:view')")
+    public Result<?> getVideo1() {
+        return Result.success("✅ 拥有 test:user:view 权限，访问 /user/view 成功");
+    }
+
+    @GetMapping("/user/add")
+    @PreAuthorize("hasAuthority('test:user:add')")
+    public Result<?> getVideo2() {
+        return Result.success("✅ 拥有 test:user:add 权限，访问 /user/add 成功");
+    }
+
+    @GetMapping("/user/edit")
+    @PreAuthorize("hasAuthority('test:user:edit')")
+    public Result<?> getVideo3() {
+        return Result.success("✅ 拥有 test:user:edit 权限，访问 /user/edit 成功");
+    }
+
+    @GetMapping("/user/delete")
+    @PreAuthorize("hasAuthority('user:user:delete')")
+    public Result<?> getVideo4() {
+        return Result.success("✅ 拥有 user:user:delete 权限，访问 /user/delete 成功");
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
 //    @GetMapping("/public")
 //    public Result<Map<String, Object>> publicEndpoint(Authentication authentication) {
 //        Map<String, Object> response = new HashMap<>();
@@ -465,4 +492,4 @@
 //        return Result.success(count);
 //    }
 //
-//} 
+} 

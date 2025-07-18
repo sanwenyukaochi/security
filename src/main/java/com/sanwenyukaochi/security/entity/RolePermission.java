@@ -15,12 +15,14 @@ import org.hibernate.annotations.Comment;
 @Comment("角色权限关联表")
 public class RolePermission extends BaseIdEntity {
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "role_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_role_permission_role_id"))
     @Comment("角色ID")
     private Role role;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "permission_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_role_permission_permission_id"))
