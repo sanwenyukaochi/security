@@ -52,6 +52,12 @@ public class RSATests {
     }
 
     @Test
+    public void testPrivateKeyStr() {
+        String privateKeyStr = RSAUtil.getPrivateKeyStr();
+        System.out.println("RSA私钥: " + privateKeyStr);
+    }
+
+    @Test
     public void testEncryptWithPublicKey() {
         String encrypted = RSAUtil.encrypt("123456");
         System.out.println("加密结果: " + encrypted);

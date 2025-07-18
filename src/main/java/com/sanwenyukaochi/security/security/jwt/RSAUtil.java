@@ -123,7 +123,7 @@ public class RSAUtil {
 			byte[] inputByte = Base64.getDecoder().decode(text.getBytes(StandardCharsets.UTF_8));
 			return new String(cipher.doFinal(inputByte));
 		} catch (Exception e) {
-			throw new CryptoException("RSA 解密失败", e);
+			throw new CryptoException("RSA 解密失败");
 		}
 	}
 

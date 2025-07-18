@@ -58,10 +58,10 @@ public class UserDetailsImpl implements UserDetails {
                 .collect(Collectors.toList());
 
         List<Role> roles = user.getRoles();
-        roles.forEach(role -> {
-            role.getId();
-            role.getDataScope();
-        });
+//        roles.forEach(role -> {
+//            role.getId();
+//            role.getDataScope();
+//        });
         return new UserDetailsImpl(
                 user.getId(),
                 user.getTenant(),
