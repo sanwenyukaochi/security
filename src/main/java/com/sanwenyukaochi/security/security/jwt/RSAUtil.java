@@ -1,13 +1,15 @@
 package com.sanwenyukaochi.security.security.jwt;
 
-import cn.hutool.crypto.CryptoException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import org.springframework.stereotype.Component;
+
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
@@ -117,14 +119,10 @@ public class RSAUtil {
 		return cipher;
 	}
 
-	public static String decrypt(String text) {
-		try {
-			Cipher cipher = getCipher();
-			byte[] inputByte = Base64.getDecoder().decode(text.getBytes(StandardCharsets.UTF_8));
-			return new String(cipher.doFinal(inputByte));
-		} catch (Exception e) {
-			throw new CryptoException("RSA 解密失败");
-		}
+	public static String decrypt(String text) throws IllegalBlockSizeException, BadPaddingException {
+		Cipher cipher = getCipher();
+		byte[] inputByte = Base64.getDecoder().decode(text.getBytes(StandardCharsets.UTF_8));
+		return new String(cipher.doFinal(inputByte));
 	}
 
 	@Data
