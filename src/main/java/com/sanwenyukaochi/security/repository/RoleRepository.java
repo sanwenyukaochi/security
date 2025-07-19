@@ -10,13 +10,13 @@ import java.util.Optional;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    @EntityGraph(attributePaths = {"tenant", "rolePermissions"})
+    @EntityGraph(attributePaths = {"tenant"})
     Optional<Role> findByCode(String code);
-    
-    @EntityGraph(attributePaths = {"tenant", "rolePermissions"})
+
+    @EntityGraph(attributePaths = {"tenant"})
     Optional<Role> findByName(String name);
-    
+
     Boolean existsByCode(String code);
-    
+
     Boolean existsByName(String name);
 } 

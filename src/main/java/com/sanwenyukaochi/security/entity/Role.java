@@ -43,14 +43,4 @@ public class Role extends BaseEntity {
     @Column(name = "status", nullable = false)
     @Comment("状态（false禁用，true启用）")
     private Boolean status = false;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<UserRole> userRoles = new ArrayList<>();
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<RolePermission> rolePermissions = new HashSet<>();
 }

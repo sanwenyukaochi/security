@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.repository;
 
+import cn.hutool.core.lang.Opt;
 import com.sanwenyukaochi.security.entity.UserRole;
 import com.sanwenyukaochi.security.entity.User;
 import com.sanwenyukaochi.security.entity.Role;
@@ -14,20 +15,22 @@ import java.util.Optional;
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
     @EntityGraph(attributePaths = {"user", "role"})
-    List<UserRole> findByUser(User user);
-    
+    List<UserRole> findAllByUser(User user);
+
     @EntityGraph(attributePaths = {"user", "role"})
-    List<UserRole> findByUser_Id(Long userId);
-    
+    List<UserRole> findAllByUser_Id(Long userId);
+
     @EntityGraph(attributePaths = {"user", "role"})
-    List<UserRole> findByRole(Role role);
-    
+    List<UserRole> findAllByRole(Role role);
+
     @EntityGraph(attributePaths = {"user", "role"})
-    List<UserRole> findByRole_Id(Long roleId);
-    
+    List<UserRole> findAllByRole_Id(Long roleId);
+
     Boolean existsByUserAndRole(User user, Role role);
-    
+
     Boolean existsByUser_IdAndRole_Id(Long userId, Long roleId);
 
     Optional<UserRole> findByUser_IdAndRole_Id(Long userId, Long roleId);
+
+    Optional<UserRole> findByUserAndRole(User user, Role role);
 }

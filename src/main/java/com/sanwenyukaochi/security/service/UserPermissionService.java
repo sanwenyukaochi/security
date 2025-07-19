@@ -23,7 +23,7 @@ public class UserPermissionService {
      * 获取用户的所有角色代码
      */
     public List<String> getUserRoleCodes(Long userId) {
-        List<UserRole> userRoles = userRoleRepository.findByUser_Id(userId);
+        List<UserRole> userRoles = userRoleRepository.findAllByUser_Id(userId);
         return userRoles.stream()
                 .map(UserRole::getRole)
                 .map(Role::getCode)
@@ -34,7 +34,7 @@ public class UserPermissionService {
      * 获取用户的所有权限代码
      */
     public List<String> getUserPermissionCodes(Long userId) {
-        List<UserRole> userRoles = userRoleRepository.findByUser_Id(userId);
+        List<UserRole> userRoles = userRoleRepository.findAllByUser_Id(userId);
 
         return userRoles.stream()
                 .map(UserRole::getRole)

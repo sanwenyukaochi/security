@@ -3,11 +3,10 @@ package com.sanwenyukaochi.security.security.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.sanwenyukaochi.security.entity.Permission;
 import com.sanwenyukaochi.security.entity.Tenant;
 import com.sanwenyukaochi.security.entity.User;
 import com.sanwenyukaochi.security.entity.Role;
-import com.sanwenyukaochi.security.service.UserPermissionService;
-import com.sanwenyukaochi.security.service.UserPermissionCacheService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,33 +20,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @Data
 public class UserDetailsImpl implements UserDetails {
-    
+
     private Long id;
-
     private Tenant tenant;
-
     private String username;
-    
     @JsonIgnore
     private String password;
-    
     private String email;
-
     private String phone;
-    
     private Boolean status;
-    
     private Boolean accountNonExpired;
-    
     private Boolean accountNonLocked;
-    
     private Boolean credentialsNonExpired;
-
     private Collection<? extends GrantedAuthority> authorities;
-
     private List<Role> roles;
+    private List<Permission> permissions;
 
-    public static UserDetailsImpl build(User user, List<String> authorityCodes, List<Role> roles) {
+    public static UserDetailsImpl build(User user, List<String> authorityCodes, List<Role> roles, List<Permission> permissions) {
         List<GrantedAuthority> grantedAuthorities = Optional.ofNullable(authorityCodes)
                 .orElseGet(Collections::emptyList).stream()
                 .map(SimpleGrantedAuthority::new)
@@ -64,23 +53,24 @@ public class UserDetailsImpl implements UserDetails {
                 user.getAccountNonLocked(),
                 user.getCredentialsNonExpired(),
                 grantedAuthorities,
-                roles
+                roles,
+                permissions
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return this.authorities;
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     @Override
@@ -111,10 +101,8 @@ public class UserDetailsImpl implements UserDetails {
         return Objects.equals(this.id, other.id);
     }
 
-
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

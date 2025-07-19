@@ -1,15 +1,12 @@
 package com.sanwenyukaochi.security.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -41,6 +38,7 @@ public class User extends BaseEntity{
 
     @Column(name = "email", length = 100, nullable = false)
     @Comment("邮箱")
+    @Email
     private String email;
 
     @Column(name = "phone", length = 20, nullable = false)
@@ -62,30 +60,4 @@ public class User extends BaseEntity{
     @Column(name = "credentials_non_expired", nullable = false)
     @Comment("密码是否未过期（true=有效，false=已过期）")
     private Boolean credentialsNonExpired = true;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<UserRole> userRoles = new ArrayList<>();
-
-    public User(String userName, String email, String password) {
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-    }
-
-    /**
-     * 获取用户所有角色
-     */
-    public List<Role> getRoles() {
-        List<Role> roles = new ArrayList<>();
-        if (userRoles != null) {
-            for (UserRole ur : userRoles) {
-                if (ur.getRole() != null) {
-                    roles.add(ur.getRole());
-                }
-            }
-        }
-        return roles;
-    }
 }

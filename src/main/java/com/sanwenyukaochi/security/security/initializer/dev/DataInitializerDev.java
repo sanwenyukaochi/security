@@ -167,7 +167,7 @@ public class DataInitializerDev implements CommandLineRunner {
     }
 
     private void bindUserAndRole(Long id, User user, Role role, Tenant tenant) {
-        userRoleRepository.findByUser_IdAndRole_Id(user.getId(), role.getId())
+        userRoleRepository.findByUserAndRole(user, role)
                 .orElseGet(() -> {
                     UserRole newUserRole = new UserRole();
                     newUserRole.setId(id);
@@ -179,7 +179,7 @@ public class DataInitializerDev implements CommandLineRunner {
     }
 
     private void bindRoleAndPermission(Long id, Role role, Permission permission, Tenant tenant) {
-        rolePermissionRepository.findByRole_IdAndPermission_Id(role.getId(), permission.getId())
+        rolePermissionRepository.findByRoleAndPermission(role, permission)
                 .orElseGet(() -> {
                     RolePermission newRolePermission = new RolePermission();
                     newRolePermission.setId(id);
