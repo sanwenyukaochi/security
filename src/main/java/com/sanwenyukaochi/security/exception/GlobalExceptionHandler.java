@@ -4,6 +4,7 @@ import cn.hutool.crypto.CryptoException;
 import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.vo.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.*;
@@ -123,6 +124,16 @@ public class GlobalExceptionHandler {
     public Result<Object> handleAuthorizationServiceException(AuthorizationServiceException e) {
         log.warn("权限系统内部错误: {}", e.getMessage(), e);
         return Result.error(HttpStatus.HTTP_FORBIDDEN, "权限系统内部错误");
+    }
+
+    // =========================
+    // 💥 数据库唯一约束或完整性异常
+    // =========================
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public Result<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.warn("数据库完整性异常: {}", e.getMessage(), e);
+        return Result.error(HttpStatus.HTTP_CONFLICT, "文件已存在");
     }
 
     // =========================

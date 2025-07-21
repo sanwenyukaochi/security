@@ -58,6 +58,8 @@ public class DataInitializerDev implements CommandLineRunner {
         Permission userAddPermission = createPermission(snowflake.nextId(), "test:user:add", "用户新增(测试)", "/api/test/user/add", 2, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
         Permission userEditPermission = createPermission(snowflake.nextId(), "test:user:edit", "用户编辑(测试)", "/api/test/user/edit", 3, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
         Permission userDeletePermission = createPermission(snowflake.nextId(), "test:user:delete", "用户删除(测试)", "/api/test/user/delete", 4, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission videoManagePermission = createPermission(snowflake.nextId(), "video:video:manage", "视频管理", "/api/video", 1, 0L, "1", true, sysTenant, userAdminId, userAdminId);
+        Permission videoUploadPermission = createPermission(snowflake.nextId(), "video:video:upload", "视频上传", "/api/video/upload", 1, userManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
 
         // 4. 绑定用户和角色
         bindUserAndRole(snowflake.nextId(), userAdmin, roleAdmin, sysTenant);
@@ -69,13 +71,13 @@ public class DataInitializerDev implements CommandLineRunner {
         bindUserAndRole(snowflake.nextId(), userBB, roleUserB, tenantB);
 
         // 6. 为每个用户创建一条视频数据
-        createVideoForUser(snowflake.nextId(), "system_admin_video1", "mp4", sysTenant, userAdmin.getId(), userAdmin.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_a_admin_video1", "mp4", tenantA, userTenantA.getId(), userTenantA.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_b_admin_video1", "mp4", tenantB, userTenantB.getId(), userTenantB.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_a_user_a_video1", "mp4", tenantA, userAA.getId(), userAA.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_a_user_b_video1", "mp4", tenantA, userAB.getId(), userAB.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_b_user_a_video1", "mp4", tenantB, userBA.getId(), userBA.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_b_user_b_video1", "mp4", tenantB, userBB.getId(), userBB.getId());
+        createVideoForUser(snowflake.nextId(), "system_admin_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",sysTenant, userAdmin.getId(), userAdmin.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_admin_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",tenantA, userTenantA.getId(), userTenantA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_admin_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",tenantB, userTenantB.getId(), userTenantB.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_user_a_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",tenantA, userAA.getId(), userAA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_user_b_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",tenantA, userAB.getId(), userAB.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_user_a_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",tenantB, userBA.getId(), userBA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_user_b_video1", "mp4", "http://videoPath.mp4", "http://cpverImage.jpg",tenantB, userBB.getId(), userBB.getId());
 
         // 绑定角色和权限
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, userManagePermission, sysTenant);
@@ -83,6 +85,8 @@ public class DataInitializerDev implements CommandLineRunner {
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, userAddPermission, sysTenant);
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, userEditPermission, sysTenant);
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, userDeletePermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, videoManagePermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, videoUploadPermission, sysTenant);
         bindRoleAndPermission(snowflake.nextId(), roleTenantA, userViewPermission, tenantA);
         bindRoleAndPermission(snowflake.nextId(), roleTenantA, userEditPermission, tenantA);
         bindRoleAndPermission(snowflake.nextId(), roleTenantB, userViewPermission, tenantB);
@@ -190,13 +194,15 @@ public class DataInitializerDev implements CommandLineRunner {
                 });
     }
 
-    private void createVideoForUser(Long id, String fileName, String fileExt, Tenant tenant, Long createdBy, Long updatedBy) {
+    private void createVideoForUser(Long id, String fileName, String fileExt, String videoPath, String coverImage, Tenant tenant, Long createdBy, Long updatedBy) {
         videoRepository.findByFileNameAndFileExt(fileName, fileExt)
                 .orElseGet(() -> {
                     Video video = new Video();
                     video.setId(id);
                     video.setFileName(fileName);
                     video.setFileExt(fileExt);
+                    video.setVideoPath(videoPath);
+                    video.setCoverImage(coverImage);
                     video.setTenantId(tenant.getId());
                     video.setCreatedBy(createdBy);
                     video.setUpdatedBy(updatedBy);

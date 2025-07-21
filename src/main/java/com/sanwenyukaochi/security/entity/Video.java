@@ -28,4 +28,15 @@ public class Video extends BaseEntity {
     @Comment("文件扩展名（后缀，不带点）")
     private String fileExt;
 
+    @Column(name = "video_path", length = 225, nullable = false)
+    @Comment("视频存储路径")
+    private String videoPath;
+
+    @Column(name = "cover_image", length = 225)
+    @Comment("视频封面存储路径")
+    private String coverImage;
+
+    public String getFullFileName() {
+        return String.format("%s.%s", getId(), fileExt);
+    }
 }
