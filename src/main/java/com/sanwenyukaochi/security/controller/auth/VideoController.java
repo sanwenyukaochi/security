@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.controller.auth;
 
+import com.sanwenyukaochi.security.ao.DeleteVideoAO;
 import com.sanwenyukaochi.security.ao.UploadVideoAO;
 import com.sanwenyukaochi.security.dto.VideoDTO;
 import com.sanwenyukaochi.security.entity.Video;
@@ -11,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.apache.commons.io.FilenameUtils;
 
 
@@ -34,8 +32,12 @@ public class VideoController {
         return Result.success(new UploadVideoVO(String.format("%s.%s",video.getFileName(),video.getFileExt()), video.getVideoPath(), video.getCoverImage()));
     }
 
-
-    
-    
-    
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('video:video:delete')")
+    @Operation(summary = "删除视频", description = "传入视频Id")
+    public Result<String> deleteVideo(@RequestBody DeleteVideoAO deleteVideoAO, Authentication authentication) {
+        VideoDTO videoDTO = new VideoDTO(deleteVideoAO.getId());
+        videoService.deleteVideo(videoDTO, authentication);
+        return Result.success("删除成功");
+    }
 }

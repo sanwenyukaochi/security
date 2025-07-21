@@ -17,4 +17,6 @@ public interface FileStorage {
     void downloadFileByCheckpoint(String objectName, String localFile);
 
     void renameObject(String oldKey, String newKey);
+
+    void deleteObject(String objectName);
 }

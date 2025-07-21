@@ -71,4 +71,14 @@ public class VideoService {
         newVideo.setTenantId(userDetails.getTenant().getId());
         return videoRepository.save(newVideo);
     }
+
+    @Transactional
+    public void deleteVideo(VideoDTO videoDTO, Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String renamedObjectPath = String.format("%s/%s/%s", userDetails.getTenant().getId(), userDetails.getId(), videoDTO.getId());
+        fileStorage.deleteObject(String.format(renamedObjectPath));
+        Path localVideoFolderPath = Paths.get(localDir, renamedObjectPath);
+        if (FileUtil.exist(localVideoFolderPath.toFile())) {FileUtil.del(localVideoFolderPath);}
+        videoRepository.deleteById(videoDTO.getId());
+    }
 }

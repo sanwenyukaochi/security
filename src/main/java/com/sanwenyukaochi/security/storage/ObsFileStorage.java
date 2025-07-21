@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -178,6 +179,34 @@ public class ObsFileStorage implements FileStorage {
         obsClient.copyObject(copyRequest);
         obsClient.deleteObject(bucketName, oldKey);
     }
+    
+    @Override
+    public void deleteObject(String objectNamePrefix){
+        try {
+            ListObjectsRequest request = new ListObjectsRequest(bucketName);
+            request.setPrefix(objectNamePrefix);
+            ObjectListing result;
+            do {
+                result = obsClient.listObjects(request);
+                List<ObsObject> objects = result.getObjects();
+
+                for (ObsObject object : objects) {
+                    String key = object.getObjectKey();
+                    obsClient.deleteObject(bucketName, key);
+                    log.info("删除成功：{}", key);
+                }
+                request.setMarker(result.getNextMarker());
+            } while (result.isTruncated());
+
+        } catch (ObsException e) {
+            log.warn("deleteObjectPrefix failed");
+            logObsException(e);
+        } catch (Exception e) {
+            log.warn("deleteObjectPrefix failed");
+            e.printStackTrace();
+        }
+    }
+    
 
     private static void logObsException(ObsException e) {
         // 请求失败,打印http状态码
