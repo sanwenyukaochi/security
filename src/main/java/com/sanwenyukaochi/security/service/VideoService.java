@@ -1,10 +1,13 @@
 package com.sanwenyukaochi.security.service;
 
 import cn.hutool.core.lang.Snowflake;
+import cn.hutool.http.HttpStatus;
 import com.sanwenyukaochi.security.annotation.DataScope;
 import com.sanwenyukaochi.security.constant.FileConstants;
+import com.sanwenyukaochi.security.bo.VideoBO;
 import com.sanwenyukaochi.security.dto.VideoDTO;
 import com.sanwenyukaochi.security.entity.Video;
+import com.sanwenyukaochi.security.exception.APIException;
 import com.sanwenyukaochi.security.repository.VideoRepository;
 import com.sanwenyukaochi.security.security.service.UserDetailsImpl;
 import com.sanwenyukaochi.security.storage.FileStorage;
@@ -42,20 +45,20 @@ public class VideoService {
 
     @Transactional
     @SneakyThrows
-    public Video uploadVideo(VideoDTO videoDTO, Authentication authentication) {
+    public VideoDTO uploadVideo(VideoBO videoBO, Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         Video newVideo = new Video();
         newVideo.setId(snowflake.nextId());
-        newVideo.setFileName(videoDTO.getFileName());
-        newVideo.setFileExt(videoDTO.getFileExt());
+        newVideo.setFileName(videoBO.getFileName());
+        newVideo.setFileExt(videoBO.getFileExt());
         // 构建新视频对象路径
-        String renamedObjectPath = String.format("%s/%s/%s/%s.%s", userDetails.getTenant().getId(), userDetails.getId(), newVideo.getId(), newVideo.getId(), videoDTO.getFileExt());
+        String renamedObjectPath = String.format("%s/%s/%s/%s.%s", userDetails.getTenant().getId(), userDetails.getId(), newVideo.getId(), newVideo.getId(), videoBO.getFileExt());
         newVideo.setVideoPath(String.format("%s/%s", fileStorage.getBucketPath(), renamedObjectPath));
         // 构建封面图路径
         String coverObjectPath = String.format("%s/%s/%s/%s/%s.%s", userDetails.getTenant().getId(), userDetails.getId(), newVideo.getId(), FileConstants.COVER_DIR_NAME, newVideo.getId(), FileConstants.EXT_JPG);
         newVideo.setCoverImage(String.format("%s/%s", fileStorage.getBucketPath(), coverObjectPath));
         // 修改 OBS 上视频对象名
-        String originalObjectPath = String.format("%s/%s/%s.%s", userDetails.getTenant().getId(), userDetails.getId(), videoDTO.getFileName(), videoDTO.getFileExt());
+        String originalObjectPath = String.format("%s/%s/%s.%s", userDetails.getTenant().getId(), userDetails.getId(), videoBO.getFileName(), videoBO.getFileExt());
         fileStorage.renameObject(originalObjectPath, renamedObjectPath);
         // 下载 OBS 视频到本地
         Path videoObjectPath = Paths.get(renamedObjectPath);
@@ -69,16 +72,18 @@ public class VideoService {
         // 上传封面图至 OBS
         fileStorage.uploadFileByFileStream(coverObjectPath, localCoverPath.toString());
         newVideo.setTenantId(userDetails.getTenant().getId());
-        return videoRepository.save(newVideo);
+        videoRepository.save(newVideo);
+        return new VideoDTO(newVideo.getFullFileNameWithName(), newVideo.getVideoPath(), newVideo.getCoverImage());
     }
 
     @Transactional
-    public void deleteVideo(VideoDTO videoDTO, Authentication authentication) {
+    public void deleteVideo(VideoBO videoBO, Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String renamedObjectPath = String.format("%s/%s/%s", userDetails.getTenant().getId(), userDetails.getId(), videoDTO.getId());
+        Video dbVideo = videoRepository.findById(videoBO.getId()).orElseThrow(() -> new APIException(HttpStatus.HTTP_NOT_FOUND, "视频不存在"));
+        String renamedObjectPath = String.format("%s/%s/%s", userDetails.getTenant().getId(), userDetails.getId(), videoBO.getId());
         fileStorage.deleteObject(String.format(renamedObjectPath));
         Path localVideoFolderPath = Paths.get(localDir, renamedObjectPath);
         if (FileUtil.exist(localVideoFolderPath.toFile())) {FileUtil.del(localVideoFolderPath);}
-        videoRepository.deleteById(videoDTO.getId());
+        videoRepository.delete(dbVideo);
     }
 }

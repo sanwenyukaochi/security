@@ -2,10 +2,10 @@ package com.sanwenyukaochi.security.security.service;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.http.HttpStatus;
-import com.sanwenyukaochi.security.dto.LoginDTO;
+import com.sanwenyukaochi.security.bo.LoginBO;
 import com.sanwenyukaochi.security.exception.APIException;
-import com.sanwenyukaochi.security.model.CaptchaPair;
-import com.sanwenyukaochi.security.model.JwtTokenPair;
+import com.sanwenyukaochi.security.model.CaptchaDTO;
+import com.sanwenyukaochi.security.model.JwtTokenDTO;
 import com.sanwenyukaochi.security.security.captcha.CaptchaContext;
 import com.sanwenyukaochi.security.security.captcha.CaptchaPairCodeAndBase;
 import com.sanwenyukaochi.security.security.jwt.JwtUtils;
@@ -37,14 +37,14 @@ public class AuthService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final Environment env;
 
-    public JwtTokenPair getTokenPair(LoginDTO loginDTO) {
-        if (!Objects.equals(loginDTO.getCaptcha(), redisTemplate.opsForValue().get(loginDTO.getCaptchaKey())) && !Arrays.asList(env.getActiveProfiles()).contains("dev")) {
+    public JwtTokenDTO getTokenPair(LoginBO loginBO) {
+        if (!Objects.equals(loginBO.getCaptcha(), redisTemplate.opsForValue().get(loginBO.getCaptchaKey())) && !Arrays.asList(env.getActiveProfiles()).contains("dev")) {
             throw new APIException(HttpStatus.HTTP_UNAUTHORIZED, "验证码不正确");
         }
-        redisTemplate.delete(loginDTO.getCaptchaKey());
+        redisTemplate.delete(loginBO.getCaptchaKey());
         Authentication authentication;
         try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), RSAUtil.decrypt(loginDTO.getPassword()));
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginBO.getUsername(), RSAUtil.decrypt(loginBO.getPassword()));
             authentication = authenticationManager.authenticate(authenticationToken);
         } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException("用户不存在");
@@ -63,11 +63,11 @@ public class AuthService {
     }
 
     @SneakyThrows
-    public CaptchaPair getCaptcha() {
+    public CaptchaDTO getCaptcha() {
         CaptchaPairCodeAndBase result = CaptchaContext.generateRandomCaptcha(130,48,5);
         String key = "captcha:" + snowflake.nextId();
         redisTemplate.opsForValue().set(key, result.getCode(), 30, TimeUnit.MINUTES);
         log.info("验证码为:{}", redisTemplate.opsForValue().get(key));
-        return new CaptchaPair(key, result.getBase64());
+        return new CaptchaDTO(key, result.getBase64());
     }
 }

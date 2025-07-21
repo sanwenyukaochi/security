@@ -1,8 +1,8 @@
 package com.sanwenyukaochi.security.controller.auth;
 
-import com.sanwenyukaochi.security.dto.LoginDTO;
-import com.sanwenyukaochi.security.model.CaptchaPair;
-import com.sanwenyukaochi.security.model.JwtTokenPair;
+import com.sanwenyukaochi.security.bo.LoginBO;
+import com.sanwenyukaochi.security.model.CaptchaDTO;
+import com.sanwenyukaochi.security.model.JwtTokenDTO;
 import com.sanwenyukaochi.security.security.jwt.RSAUtil;
 import com.sanwenyukaochi.security.ao.LoginAO;
 
@@ -32,16 +32,16 @@ public class AuthController {
     @PostMapping("/signIn")
     @Operation(summary = "获取认证token", description = "传入账号:username,密码:password")
     public Result<LoginVO> authenticateUser(@Valid @RequestBody LoginAO loginAO) {
-        LoginDTO loginDTO = new LoginDTO(loginAO.getUsername(), loginAO.getPassword(), loginAO.getCaptchaKey(), loginAO.getCaptcha());
-        JwtTokenPair jwtTokenPair = authService.getTokenPair(loginDTO);
-        return Result.success(new LoginVO(jwtTokenPair.getAccessToken(), jwtTokenPair.getRefreshToken()));
+        LoginBO loginBO = new LoginBO(loginAO.getUsername(), loginAO.getPassword(), loginAO.getCaptchaKey(), loginAO.getCaptcha());
+        JwtTokenDTO jwtTokenDTO = authService.getTokenPair(loginBO);
+        return Result.success(new LoginVO(jwtTokenDTO.getAccessToken(), jwtTokenDTO.getRefreshToken()));
     }
 
     @GetMapping("/captcha")
     @Operation(summary = "获取验证码")
     public Result<CaptchaVO> captcha() {
-        CaptchaPair captcha = authService.getCaptcha();
-        return Result.success(new CaptchaVO(captcha.getCaptchaKey(), captcha.getCaptcha()));
+        CaptchaDTO captchaDTO = authService.getCaptcha();
+        return Result.success(new CaptchaVO(captchaDTO.getCaptchaKey(), captchaDTO.getCaptcha()));
     }
     
     @PostMapping("/signOut")

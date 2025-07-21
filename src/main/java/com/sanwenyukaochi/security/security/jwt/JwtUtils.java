@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.security.jwt;
 
 
-import com.sanwenyukaochi.security.model.JwtTokenPair;
+import com.sanwenyukaochi.security.model.JwtTokenDTO;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,10 @@ public class JwtUtils {
         return null;
     }
 
-    public JwtTokenPair generateTokenPairFromUsername(String username) {
+    public JwtTokenDTO generateTokenPairFromUsername(String username) {
         String accessToken = generateTokenFromUsername(username);
         String refreshToken = generateRefreshToken(username);
-        return new JwtTokenPair(accessToken, refreshToken);
+        return new JwtTokenDTO(accessToken, refreshToken);
     }
 
     public String generateTokenFromUsername(String username) {

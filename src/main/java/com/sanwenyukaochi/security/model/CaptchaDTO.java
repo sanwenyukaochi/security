@@ -1,13 +1,11 @@
-package com.sanwenyukaochi.security.dto;
+package com.sanwenyukaochi.security.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class LoginDTO {
-    private String username;
-    private String password;
+public class CaptchaDTO {
     private String captchaKey;
     private String captcha;
 }

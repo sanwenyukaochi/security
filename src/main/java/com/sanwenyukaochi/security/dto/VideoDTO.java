@@ -1,21 +1,14 @@
 package com.sanwenyukaochi.security.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class VideoDTO {
-    private Long id;
-    private String fileName;
-    private String fileExt;
-
-    public VideoDTO(Long id) {
-        this.id = id;
-    }
-    
-    public VideoDTO(String fileName, String fileExt) {
-        this.fileName = fileName;
-        this.fileExt = fileExt;
-    }
+    private String videoName;
+    private String videoPath;
+    private String coverImage;
 }

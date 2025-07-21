@@ -2,6 +2,7 @@ package com.sanwenyukaochi.security.controller.auth;
 
 import com.sanwenyukaochi.security.ao.DeleteVideoAO;
 import com.sanwenyukaochi.security.ao.UploadVideoAO;
+import com.sanwenyukaochi.security.bo.VideoBO;
 import com.sanwenyukaochi.security.dto.VideoDTO;
 import com.sanwenyukaochi.security.entity.Video;
 import com.sanwenyukaochi.security.service.VideoService;
@@ -27,17 +28,17 @@ public class VideoController {
     @PreAuthorize("hasAuthority('video:video:upload')")
     @Operation(summary = "上传视频", description = "传入视频名称videoName")
     public Result<UploadVideoVO> uploadVideo(@RequestBody UploadVideoAO uploadVideoAO, Authentication authentication) {
-        VideoDTO videoDTO = new VideoDTO(FilenameUtils.getBaseName(uploadVideoAO.getVideoName()), FilenameUtils.getExtension(uploadVideoAO.getVideoName()));
-        Video video = videoService.uploadVideo(videoDTO, authentication);
-        return Result.success(new UploadVideoVO(String.format("%s.%s",video.getFileName(),video.getFileExt()), video.getVideoPath(), video.getCoverImage()));
+        VideoBO newVideoBO = new VideoBO(FilenameUtils.getBaseName(uploadVideoAO.getVideoName()), FilenameUtils.getExtension(uploadVideoAO.getVideoName()));
+        VideoDTO newVideoDTO = videoService.uploadVideo(newVideoBO, authentication);
+        return Result.success(new UploadVideoVO(newVideoDTO.getVideoName(), newVideoDTO.getVideoPath(), newVideoDTO.getCoverImage()));
     }
 
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('video:video:delete')")
     @Operation(summary = "删除视频", description = "传入视频Id")
     public Result<String> deleteVideo(@RequestBody DeleteVideoAO deleteVideoAO, Authentication authentication) {
-        VideoDTO videoDTO = new VideoDTO(deleteVideoAO.getId());
-        videoService.deleteVideo(videoDTO, authentication);
+        VideoBO newVideoBO = new VideoBO(deleteVideoAO.getId());
+        videoService.deleteVideo(newVideoBO, authentication);
         return Result.success("删除成功");
     }
 }

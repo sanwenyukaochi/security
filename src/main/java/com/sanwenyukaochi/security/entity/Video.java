@@ -36,7 +36,11 @@ public class Video extends BaseEntity {
     @Comment("视频封面存储路径")
     private String coverImage;
 
-    public String getFullFileName() {
+    public String getFullFileNameWithName() {
+        return String.format("%s.%s", fileName, fileExt);
+    }
+
+    public String getFullFileNameWithId() {
         return String.format("%s.%s", getId(), fileExt);
     }
 }
