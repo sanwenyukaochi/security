@@ -40,13 +40,13 @@ public class VideoService {
     private String localDir;
 
     @DataScope
-    public Page<VideoDTO> findAllVideo(Pageable pageable) {
-        Page<Video> all = videoRepository.findAll(pageable);
+    public Page<VideoDTO> findAllVideo(VideoBO newVideoBO, Pageable pageable) {
+        Page<Video> all = newVideoBO.getHasClips() == null ? videoRepository.findAll(pageable) : videoRepository.findAllByHasClips(newVideoBO.getHasClips(), pageable);
         return all.map(newVideo -> new VideoDTO(
-                newVideo.getFullFileNameWithName(), 
-                newVideo.getFileSize(), 
-                newVideo.getDuration(), 
-                newVideo.getVideoPath(), 
+                newVideo.getFullFileNameWithName(),
+                newVideo.getFileSize(),
+                newVideo.getDuration(),
+                newVideo.getVideoPath(),
                 newVideo.getCoverImage()
         ));
     }
@@ -84,10 +84,10 @@ public class VideoService {
         newVideo.setTenantId(userDetails.getTenant().getId());
         videoRepository.save(newVideo);
         return new VideoDTO(
-                newVideo.getFullFileNameWithName(), 
-                newVideo.getFileSize(), 
-                newVideo.getDuration(), 
-                newVideo.getVideoPath(), 
+                newVideo.getFullFileNameWithName(),
+                newVideo.getFileSize(),
+                newVideo.getDuration(),
+                newVideo.getVideoPath(),
                 newVideo.getCoverImage()
         );
     }
@@ -109,10 +109,10 @@ public class VideoService {
         dbVideo.setFileExt(videoBO.getFileExt());
         videoRepository.save(dbVideo);
         return new VideoDTO(
-                dbVideo.getFullFileNameWithName(), 
-                dbVideo.getFileSize(), 
-                dbVideo.getDuration(), 
-                dbVideo.getVideoPath(), 
+                dbVideo.getFullFileNameWithName(),
+                dbVideo.getFileSize(),
+                dbVideo.getDuration(),
+                dbVideo.getVideoPath(),
                 dbVideo.getCoverImage()
         );
     }

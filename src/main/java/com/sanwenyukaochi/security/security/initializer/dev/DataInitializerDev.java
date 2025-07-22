@@ -74,13 +74,13 @@ public class DataInitializerDev implements CommandLineRunner {
         bindUserAndRole(snowflake.nextId(), userBB, roleUserB, tenantB);
 
         // 6. 为每个用户创建一条视频数据
-        createVideoForUser(snowflake.nextId(), "system_admin_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",sysTenant, userAdmin.getId(), userAdmin.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_a_admin_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",tenantA, userTenantA.getId(), userTenantA.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_b_admin_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",tenantB, userTenantB.getId(), userTenantB.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_a_user_a_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",tenantA, userAA.getId(), userAA.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_a_user_b_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",tenantA, userAB.getId(), userAB.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_b_user_a_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",tenantB, userBA.getId(), userBA.getId());
-        createVideoForUser(snowflake.nextId(), "tenant_b_user_b_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg",tenantB, userBB.getId(), userBB.getId());
+        createVideoForUser(snowflake.nextId(), "system_admin_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, sysTenant, userAdmin.getId(), userAdmin.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_admin_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, tenantA, userTenantA.getId(), userTenantA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_admin_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, tenantB, userTenantB.getId(), userTenantB.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_user_a_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, tenantA, userAA.getId(), userAA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_a_user_b_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, tenantA, userAB.getId(), userAB.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_user_a_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, tenantB, userBA.getId(), userBA.getId());
+        createVideoForUser(snowflake.nextId(), "tenant_b_user_b_video1", "mp4", 0L, 0.0, "http://videoPath.mp4", "http://cpverImage.jpg", false, false, tenantB, userBB.getId(), userBB.getId());
 
         // 绑定角色和权限
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, userManagePermission, sysTenant);
@@ -200,7 +200,7 @@ public class DataInitializerDev implements CommandLineRunner {
                 });
     }
 
-    private void createVideoForUser(Long id, String fileName, String fileExt, Long fileSize, Double duration, String videoPath, String coverImage, Tenant tenant, Long createdBy, Long updatedBy) {
+    private void createVideoForUser(Long id, String fileName, String fileExt, Long fileSize, Double duration, String videoPath, String coverImage, Boolean hasClips, Boolean hasOutline, Tenant tenant, Long createdBy, Long updatedBy) {
         videoRepository.findByFileNameAndFileExt(fileName, fileExt)
                 .orElseGet(() -> {
                     Video video = new Video();
@@ -211,6 +211,8 @@ public class DataInitializerDev implements CommandLineRunner {
                     video.setDuration(duration);
                     video.setVideoPath(videoPath);
                     video.setCoverImage(coverImage);
+                    video.setHasClips(hasClips);
+                    video.setHasOutline(hasOutline);
                     video.setTenantId(tenant.getId());
                     video.setCreatedBy(createdBy);
                     video.setUpdatedBy(updatedBy);

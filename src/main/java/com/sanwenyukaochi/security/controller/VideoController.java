@@ -50,12 +50,16 @@ public class VideoController {
     }
 
     @GetMapping("/queryVideo")
+    @PreAuthorize("hasAuthority('video:video:view')")
     public Result<PageVO<QueryVideoVO>> getVideo(@RequestParam(defaultValue = "0") int currentPage, @RequestParam(defaultValue = "6") int size, 
                                                  @RequestBody QueryVideoAO queryVideoAO) {
         // TODO 条件过滤这边后续要更新一下
         Pageable pageable = PageRequest.of(currentPage, size, 
                 Sort.by("asc".equalsIgnoreCase(queryVideoAO.getOrder()) ? Sort.Direction.ASC : Sort.Direction.DESC, queryVideoAO.getSortType()));
-        Page<VideoDTO> videoPage = videoService.findAllVideo(pageable);
+        VideoBO newVideoBO = new VideoBO(
+                queryVideoAO.getHasClips()
+        );
+        Page<VideoDTO> videoPage = videoService.findAllVideo(newVideoBO, pageable);
         return Result.success(PageVO.from(videoPage.map(video -> new QueryVideoVO(
                 video.getVideoName(),
                 video.getFileSize(),

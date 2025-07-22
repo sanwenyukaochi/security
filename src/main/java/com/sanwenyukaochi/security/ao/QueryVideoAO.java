@@ -10,4 +10,5 @@ import lombok.Setter;
 public class QueryVideoAO {
     private String sortType = "createdAt";
     private String order = "desc";
+    private Boolean hasClips = null;
 }

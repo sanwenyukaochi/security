@@ -44,6 +44,14 @@ public class Video extends BaseEntity {
     @Comment("视频封面存储路径")
     private String coverImage;
 
+    @Column(name = "has_clips", nullable = false)
+    @Comment("是否有视频切片，true表示有")
+    private Boolean hasClips = false;
+    
+    @Column(name = "has_outline", nullable = false)
+    @Comment("是否有视频目录，true表示有")
+    private Boolean hasOutline = false;
+    
     public String getFullFileNameWithName() {
         return String.format("%s.%s", fileName, fileExt);
     }
