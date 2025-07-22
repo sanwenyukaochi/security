@@ -86,4 +86,12 @@ public class VideoService {
         if (FileUtil.exist(localVideoFolderPath.toFile())) {FileUtil.del(localVideoFolderPath);}
         videoRepository.delete(dbVideo);
     }
+
+    public VideoDTO updateVideo(VideoBO videoBO) {
+        Video dbVideo = videoRepository.findById(videoBO.getId()).orElseThrow(() -> new APIException(HttpStatus.HTTP_NOT_FOUND, "视频不存在"));
+        dbVideo.setFileName(videoBO.getFileName());
+        dbVideo.setFileExt(videoBO.getFileExt());
+        videoRepository.save(dbVideo);
+        return new VideoDTO(dbVideo.getFullFileNameWithName(), dbVideo.getVideoPath(), dbVideo.getCoverImage());
+    }
 }
