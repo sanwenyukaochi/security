@@ -85,6 +85,37 @@ public class FfmpegUtils {
     }
 
     /**
+     * 视频时长
+     */
+    public static double getVideoDuration(String inputVideoPath) throws IOException, InterruptedException {
+        ProcessBuilder ffprobeProcess = new ProcessBuilder(
+                "ffprobe",
+                "-v", "error",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                inputVideoPath
+        );
+
+        Process process = ffprobeProcess.start();
+        StringBuilder output = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new RuntimeException("ffprobe 获取视频时长失败，exitCode=" + exitCode);
+        }
+
+        return Double.parseDouble(output.toString().trim());
+    }
+
+
+    /**
      * 执行 Process 并打印日志
      */
     private static void executeProcess(ProcessBuilder processBuilder, String taskName) throws IOException, InterruptedException {

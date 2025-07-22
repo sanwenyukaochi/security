@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(using = ToStringSerializer.class)
 public class DeleteVideoAO {
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 }

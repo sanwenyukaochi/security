@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,8 +40,15 @@ public class VideoService {
     private String localDir;
 
     @DataScope
-    public Page<Video> findAllVideo(Pageable pageable) {
-        return videoRepository.findAll(pageable);
+    public Page<VideoDTO> findAllVideo(Pageable pageable) {
+        Page<Video> all = videoRepository.findAll(pageable);
+        return all.map(newVideo -> new VideoDTO(
+                newVideo.getFullFileNameWithName(), 
+                newVideo.getFileSize(), 
+                newVideo.getDuration(), 
+                newVideo.getVideoPath(), 
+                newVideo.getCoverImage()
+        ));
     }
 
     @Transactional
@@ -71,9 +79,17 @@ public class VideoService {
         FfmpegUtils.getFirstImageFromVideo(localVideoPath.toString(), "00:00:00.000", localCoverPath.toString());
         // 上传封面图至 OBS
         fileStorage.uploadFileByFileStream(coverObjectPath, localCoverPath.toString());
+        newVideo.setFileSize(new File(localVideoPath.toString()).length());
+        newVideo.setDuration(FfmpegUtils.getVideoDuration(localVideoPath.toString()));
         newVideo.setTenantId(userDetails.getTenant().getId());
         videoRepository.save(newVideo);
-        return new VideoDTO(newVideo.getFullFileNameWithName(), newVideo.getVideoPath(), newVideo.getCoverImage());
+        return new VideoDTO(
+                newVideo.getFullFileNameWithName(), 
+                newVideo.getFileSize(), 
+                newVideo.getDuration(), 
+                newVideo.getVideoPath(), 
+                newVideo.getCoverImage()
+        );
     }
 
     @Transactional
@@ -92,6 +108,12 @@ public class VideoService {
         dbVideo.setFileName(videoBO.getFileName());
         dbVideo.setFileExt(videoBO.getFileExt());
         videoRepository.save(dbVideo);
-        return new VideoDTO(dbVideo.getFullFileNameWithName(), dbVideo.getVideoPath(), dbVideo.getCoverImage());
+        return new VideoDTO(
+                dbVideo.getFullFileNameWithName(), 
+                dbVideo.getFileSize(), 
+                dbVideo.getDuration(), 
+                dbVideo.getVideoPath(), 
+                dbVideo.getCoverImage()
+        );
     }
 }

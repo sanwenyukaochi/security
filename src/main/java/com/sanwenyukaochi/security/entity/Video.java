@@ -28,6 +28,14 @@ public class Video extends BaseEntity {
     @Comment("文件扩展名（后缀，不带点）")
     private String fileExt;
 
+    @Column(name = "file_size", nullable = false)
+    @Comment("视频文件大小，单位字节")
+    private Long fileSize;
+
+    @Column(name = "duration", nullable = false)
+    @Comment("视频时长，单位秒")
+    private Double duration;
+
     @Column(name = "video_path", length = 225, nullable = false)
     @Comment("视频存储路径")
     private String videoPath;

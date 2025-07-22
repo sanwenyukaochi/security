@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(using = ToStringSerializer.class)
 public class UpdateVideoAO {
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String videoName;
 }

@@ -33,20 +33,6 @@ public class TestController {
     private final VideoRepository videoRepository;
     private final VideoService videoService;
 
-    @GetMapping("/queryVideo")
-    public Result<?> getVideo(@RequestParam(defaultValue = "0") int currentPage,
-                              @RequestParam(defaultValue = "6") int size) {
-        log.info("请求追踪ID为: {}", RequestCorrelationIdFilter.getCurrentRequestId());
-        Pageable pageable = PageRequest.of(currentPage, size);
-        Page<Video> allVideo = videoService.findAllVideo(pageable);
-        return Result.success(PageVO.from(allVideo.map(video -> {
-            Map<String, Object> simple = new HashMap<>();
-            simple.put("id", video.getId());
-            simple.put("videoName", video.getFileName() + "." + video.getFileExt());
-            return simple;
-        })));
-    }
-
     @GetMapping("/user/view")
     @PreAuthorize("hasAuthority('test:user:view')")
     public Result<?> getVideo1() {
