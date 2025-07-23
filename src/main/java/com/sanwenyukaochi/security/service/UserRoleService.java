@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.service;
 
 import com.sanwenyukaochi.security.entity.User;
-import com.sanwenyukaochi.security.entity.UserRole;
+import com.sanwenyukaochi.security.entity.relation.UserRole;
 import com.sanwenyukaochi.security.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

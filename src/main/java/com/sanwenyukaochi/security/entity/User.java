@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.entity;
 
+import com.sanwenyukaochi.security.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,12 +14,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_users",
+@Table(name = "sys_user",
         indexes = {@Index(name = "uk_user_username", columnList = "created_by, user_name", unique = true)}
 )
 @EntityListeners(AuditingEntityListener.class)
 @Comment("用户表")
-public class User extends BaseEntity{
+public class User extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant", nullable = false,

@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.entity;
 
+import com.sanwenyukaochi.security.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_tenants", 
+@Table(name = "sys_tenant", 
         uniqueConstraints = {@UniqueConstraint(name = "uk_tenant_name", columnNames = "name")}
 )
 @EntityListeners(AuditingEntityListener.class)

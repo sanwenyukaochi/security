@@ -1,22 +1,17 @@
 package com.sanwenyukaochi.security.entity;
 
+import com.sanwenyukaochi.security.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_roles",
+@Table(name = "sys_role",
         indexes = {@Index(name = "uk_role_code", columnList = "created_by, code", unique = true)}
 )
 @EntityListeners(AuditingEntityListener.class)

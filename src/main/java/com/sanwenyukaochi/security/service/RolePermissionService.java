@@ -1,7 +1,7 @@
 package com.sanwenyukaochi.security.service;
 
 import com.sanwenyukaochi.security.entity.Role;
-import com.sanwenyukaochi.security.entity.RolePermission;
+import com.sanwenyukaochi.security.entity.relation.RolePermission;
 import com.sanwenyukaochi.security.repository.RolePermissionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

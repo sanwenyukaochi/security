@@ -1,5 +1,6 @@
 package com.sanwenyukaochi.security.entity;
 
+import com.sanwenyukaochi.security.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,12 +9,15 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "sys_videos",
+@Table(name = "sys_video",
         indexes = {@Index(name = "uk_video_name", columnList = "created_by, file_name, file_ext", unique = true)}
 )
 @EntityListeners(AuditingEntityListener.class)
@@ -51,6 +55,9 @@ public class Video extends BaseEntity {
     @Column(name = "has_outline", nullable = false)
     @Comment("是否有视频目录，true表示有")
     private Boolean hasOutline = false;
+
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ClipGroup> clipGroups = new ArrayList<>();
     
     public String getFullFileNameWithName() {
         return String.format("%s.%s", fileName, fileExt);

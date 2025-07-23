@@ -1,6 +1,8 @@
 package com.sanwenyukaochi.security.service;
 
 import com.sanwenyukaochi.security.entity.*;
+import com.sanwenyukaochi.security.entity.relation.RolePermission;
+import com.sanwenyukaochi.security.entity.relation.UserRole;
 import com.sanwenyukaochi.security.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

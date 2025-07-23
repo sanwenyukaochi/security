@@ -1,7 +1,6 @@
 package com.sanwenyukaochi.security.repository;
 
-import cn.hutool.core.lang.Opt;
-import com.sanwenyukaochi.security.entity.UserRole;
+import com.sanwenyukaochi.security.entity.relation.UserRole;
 import com.sanwenyukaochi.security.entity.User;
 import com.sanwenyukaochi.security.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;

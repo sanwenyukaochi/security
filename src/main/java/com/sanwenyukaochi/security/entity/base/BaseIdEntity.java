@@ -1,4 +1,4 @@
-package com.sanwenyukaochi.security.entity;
+package com.sanwenyukaochi.security.entity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;

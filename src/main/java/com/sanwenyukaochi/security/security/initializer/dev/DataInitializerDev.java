@@ -2,6 +2,8 @@ package com.sanwenyukaochi.security.security.initializer.dev;
 
 import cn.hutool.core.lang.Snowflake;
 import com.sanwenyukaochi.security.entity.*;
+import com.sanwenyukaochi.security.entity.relation.RolePermission;
+import com.sanwenyukaochi.security.entity.relation.UserRole;
 import com.sanwenyukaochi.security.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
