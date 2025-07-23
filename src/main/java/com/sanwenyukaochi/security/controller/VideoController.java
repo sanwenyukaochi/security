@@ -6,10 +6,12 @@ import com.sanwenyukaochi.security.ao.UpdateVideoAO;
 import com.sanwenyukaochi.security.ao.UploadVideoAO;
 import com.sanwenyukaochi.security.bo.VideoBO;
 import com.sanwenyukaochi.security.dto.VideoDTO;
+import com.sanwenyukaochi.security.enums.VideoType;
 import com.sanwenyukaochi.security.service.VideoService;
 import com.sanwenyukaochi.security.vo.QueryVideoVO;
 import com.sanwenyukaochi.security.vo.Result;
 import com.sanwenyukaochi.security.vo.UploadVideoVO;
+import com.sanwenyukaochi.security.vo.VideoTypeVO;
 import com.sanwenyukaochi.security.vo.page.PageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.apache.commons.io.FilenameUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -97,5 +103,16 @@ public class VideoController {
         );
         videoService.deleteVideo(newVideoBO, authentication);
         return Result.success("删除成功");
+    }
+
+    // TODO 未来可以考虑数据库字典表而不是枚举类型硬编码
+    @GetMapping("/type")
+    @PreAuthorize("hasAuthority('video:video:type')")
+    @Operation(summary = "视频类型")
+    public Result<List<VideoTypeVO>> getVideoType() {
+        return Result.success(Arrays.stream(VideoType.values()).map(type -> new VideoTypeVO(
+                type.name(), 
+                type.getType()
+        )).collect(Collectors.toList()));
     }
 }
