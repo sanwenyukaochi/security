@@ -50,6 +50,10 @@ public class User extends BaseEntity {
     @Comment("手机号")
     private String phone;
 
+    @Column(name = "avatar")
+    @Comment("头像")
+    private String avatar;
+
     @Column(name = "status", nullable = false)
     @Comment("状态（true=启用，false=禁用）")
     private Boolean status = true;

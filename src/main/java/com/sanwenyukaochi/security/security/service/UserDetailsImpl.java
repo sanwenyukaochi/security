@@ -24,10 +24,12 @@ public class UserDetailsImpl implements UserDetails {
     private Long id;
     private Tenant tenant;
     private String username;
+    private String nickName;
     @JsonIgnore
     private String password;
     private String email;
     private String phone;
+    private String avatar;
     private Boolean status;
     private Boolean accountNonExpired;
     private Boolean accountNonLocked;
@@ -35,6 +37,8 @@ public class UserDetailsImpl implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
     private List<Role> roles;
     private List<Permission> permissions;
+    private Long createdAt;
+    private Long updatedAt;
 
     public static UserDetailsImpl build(User user, List<String> authorityCodes, List<Role> roles, List<Permission> permissions) {
         List<GrantedAuthority> grantedAuthorities = Optional.ofNullable(authorityCodes)
@@ -45,16 +49,20 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getTenant(),
                 user.getUserName(),
+                user.getNickName(),
                 user.getPassword(),
                 user.getEmail(),
                 user.getPhone(),
+                user.getAvatar(),
                 user.getStatus(),
                 user.getAccountNonExpired(),
                 user.getAccountNonLocked(),
                 user.getCredentialsNonExpired(),
                 grantedAuthorities,
                 roles,
-                permissions
+                permissions,
+                user.getUpdatedAt(),
+                user.getCreatedAt()
         );
     }
 
