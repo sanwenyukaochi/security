@@ -57,6 +57,7 @@ public class VideoController {
 
     @GetMapping("/queryVideo")
     @PreAuthorize("hasAuthority('video:video:view')")
+    @Operation(summary = "查询视频")
     public Result<PageVO<QueryVideoVO>> getVideo(@RequestParam(defaultValue = "0") int currentPage, @RequestParam(defaultValue = "6") int size, 
                                                  @RequestBody QueryVideoAO queryVideoAO) {
         // TODO 条件过滤这边后续要更新一下

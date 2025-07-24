@@ -31,6 +31,10 @@ public class User extends BaseEntity {
     @Comment("用户名")
     private String userName;
 
+    @Column(name = "nick_name", length = 50, nullable = false)
+    @Comment("用户昵称")
+    private String nickName;
+
     @Column(name = "password_hash", nullable = false)
     @Comment("用户密码")
     @NotBlank
