@@ -1,6 +1,5 @@
 package com.sanwenyukaochi.security.security.filter;
 
-
 import com.sanwenyukaochi.security.security.jwt.JwtUtils;
 import com.sanwenyukaochi.security.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -16,11 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -30,21 +27,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsService;
-    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private static final String[] WHITELIST = {
-            "/api/auth/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources/**",
-            "/webjars/**"
-    };
-
-    @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return Arrays.stream(WHITELIST).anyMatch(pattern -> pathMatcher.match(pattern, uri));
-    }
+    // TODO 这个过滤器中应该不需要再写一遍过滤以下的这些路由
+//    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+//    private static final String[] WHITELIST = {
+//            "/api/auth/**",
+//            "/v3/api-docs/**",
+//            "/swagger-ui/**",
+//            "/swagger-ui.html",
+//            "/swagger-resources/**",
+//            "/webjars/**"
+//    };
+//
+//    @Override
+//    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+//        String uri = request.getRequestURI();
+//        return Arrays.stream(WHITELIST).anyMatch(pattern -> pathMatcher.match(pattern, uri));
+//    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)

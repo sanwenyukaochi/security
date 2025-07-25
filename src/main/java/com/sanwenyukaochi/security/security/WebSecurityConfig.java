@@ -91,9 +91,10 @@ public class WebSecurityConfig {
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler));
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authorizeHttpRequests(
-                auth -> auth.requestMatchers(
-                    "/api/auth/**"
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/portfolio/**"
                 ).permitAll()
                 .requestMatchers(
                     "/v3/api-docs/**",
