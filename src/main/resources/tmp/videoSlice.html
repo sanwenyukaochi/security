@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Video Slice Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>WebSocket 视频切片测试</h2>
+<input type="text" id="jwt" placeholder="输入 JWT Token" style="width: 400px" />
+<button onclick="connect()">连接</button>
+<button onclick="sendSliceRequest()">发送切片请求</button>
+<pre id="output"></pre>
+
+<script>
+  let stompClient = null;
+
+  function connect() {
+      const socket = new SockJS("http://localhost:8080/portfolio");
+      stompClient = Stomp.over(socket);
+      
+      const jwt = document.getElementById('jwt').value;
+      
+      stompClient.connect({ Authorization: 'Bearer ' + jwt }, function (frame) {
+          document.getElementById("output").innerText += "连接成功: " + frame + "\n";
+
+          stompClient.subscribe("/user/queue/video-slice/result", function (message) {
+              document.getElementById("output").innerText += "收到响应:\n" + message.body + "\n";
+          });
+      });
+  }
+
+  function sendSliceRequest() {
+      const payload = {
+          id: "1948227707372441600",                // 注意：需要是 Long 类型字符串
+          taskType: "SLICE",
+          videoType: "LIVE_STREAM",
+          adaptiveThreshold: 30,
+          addSubtitle: true
+      };
+      stompClient.send("/app/video/slice/create", {}, JSON.stringify(payload));
+      document.getElementById("output").innerText += "发送切片请求:\n" + JSON.stringify(payload) + "\n";
+  }
+</script>
+</body>
+</html>

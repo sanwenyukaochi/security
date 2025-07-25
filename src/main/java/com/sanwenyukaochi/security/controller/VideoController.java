@@ -1,10 +1,8 @@
 package com.sanwenyukaochi.security.controller;
 
-import com.sanwenyukaochi.security.ao.DeleteVideoAO;
-import com.sanwenyukaochi.security.ao.QueryVideoAO;
-import com.sanwenyukaochi.security.ao.UpdateVideoAO;
-import com.sanwenyukaochi.security.ao.UploadVideoAO;
+import com.sanwenyukaochi.security.ao.*;
 import com.sanwenyukaochi.security.bo.VideoBO;
+import com.sanwenyukaochi.security.bo.VideoSliceBO;
 import com.sanwenyukaochi.security.dto.VideoDTO;
 import com.sanwenyukaochi.security.enums.VideoType;
 import com.sanwenyukaochi.security.service.VideoService;
@@ -14,12 +12,16 @@ import com.sanwenyukaochi.security.vo.UploadVideoVO;
 import com.sanwenyukaochi.security.vo.VideoTypeVO;
 import com.sanwenyukaochi.security.vo.page.PageVO;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -114,5 +116,20 @@ public class VideoController {
                 type.name(), 
                 type.getType()
         )).collect(Collectors.toList()));
+    }
+
+    @MessageMapping("/video/slice/create")
+    @SendToUser("/queue/video-slice/result")
+    @PreAuthorize("hasAuthority('video:video:slice')")
+    @Operation(summary = "视频切片")
+    public String createVideoSlice(@Valid @Payload VideoSliceAO videoSliceAO, Authentication authentication) {
+        VideoSliceBO videoSliceBO = new VideoSliceBO(
+                videoSliceAO.getId(), 
+                videoSliceAO.getTaskType(), 
+                videoSliceAO.getVideoType(), 
+                videoSliceAO.getAdaptiveThreshold(), 
+                videoSliceAO.isAddSubtitle()
+        );
+        return videoService.createVideoSlice(videoSliceBO, authentication);
     }
 }

@@ -63,8 +63,9 @@ public class DataInitializerDev implements CommandLineRunner {
         Permission videoManagePermission = createPermission(snowflake.nextId(), "video:video:manage", "视频管理", "/api/video", 1, 0L, "1", true, sysTenant, userAdminId, userAdminId);
         Permission videoUploadPermission = createPermission(snowflake.nextId(), "video:video:upload", "视频上传", "/api/video/upload", 1, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
         Permission videoViewPermission = createPermission(snowflake.nextId(), "video:video:view", "视频查看", "/api/video/view", 2, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
-        Permission videoUpdatePermission = createPermission(snowflake.nextId(), "video:video:update", "视频重命名", "/api/video/rename", 2, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
-        Permission videoDeletePermission = createPermission(snowflake.nextId(), "video:video:delete", "视频删除", "/api/video/delete", 3, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission videoUpdatePermission = createPermission(snowflake.nextId(), "video:video:update", "视频重命名", "/api/video/rename", 3, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission videoDeletePermission = createPermission(snowflake.nextId(), "video:video:delete", "视频删除", "/api/video/delete", 4, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
+        Permission videoSlicePermission = createPermission(snowflake.nextId(), "video:video:slice", "视频切片", "/video/slice/create", 5, videoManagePermission.getId(), "2", true, sysTenant, userAdminId, userAdminId);
 
         // 4. 绑定用户和角色
         bindUserAndRole(snowflake.nextId(), userAdmin, roleAdmin, sysTenant);
@@ -95,6 +96,8 @@ public class DataInitializerDev implements CommandLineRunner {
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, videoViewPermission, sysTenant);
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, videoUpdatePermission, sysTenant);
         bindRoleAndPermission(snowflake.nextId(), roleAdmin, videoDeletePermission, sysTenant);
+        bindRoleAndPermission(snowflake.nextId(), roleAdmin, videoSlicePermission, sysTenant);
+        
         bindRoleAndPermission(snowflake.nextId(), roleTenantA, userViewPermission, tenantA);
         bindRoleAndPermission(snowflake.nextId(), roleTenantA, userEditPermission, tenantA);
         bindRoleAndPermission(snowflake.nextId(), roleTenantB, userViewPermission, tenantB);
