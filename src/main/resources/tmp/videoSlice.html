@@ -10,6 +10,7 @@
 <h2>WebSocket 视频切片测试</h2>
 <input type="text" id="jwt" placeholder="输入 JWT Token" style="width: 400px" />
 <button onclick="connect()">连接</button>
+<button onclick="disconnect()">断开连接</button>
 <button onclick="sendSliceRequest()">发送切片请求</button>
 <pre id="output"></pre>
 
@@ -28,12 +29,28 @@
           stompClient.subscribe("/user/queue/video-slice/result", function (message) {
               document.getElementById("output").innerText += "收到响应:\n" + message.body + "\n";
           });
+      }, function (error) {
+          document.getElementById("output").innerText += "连接失败: " + error + "\n";
       });
   }
 
+  function disconnect() {
+      if (stompClient && stompClient.connected) {
+          stompClient.disconnect(function () {
+              document.getElementById("output").innerText += "已断开连接\n";
+          });
+      } else {
+          document.getElementById("output").innerText += "未连接，无需断开\n";
+      }
+  }
+
   function sendSliceRequest() {
+      if (!stompClient || !stompClient.connected) {
+          document.getElementById("output").innerText += "请先连接 WebSocket！\n";
+          return;
+      }
       const payload = {
-          id: "1948227707372441600",                // 注意：需要是 Long 类型字符串
+          id: "1948227707372441600",
           taskType: "SLICE",
           videoType: "LIVE_STREAM",
           adaptiveThreshold: 30,

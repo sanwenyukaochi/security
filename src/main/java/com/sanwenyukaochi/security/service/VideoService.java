@@ -136,7 +136,6 @@ public class VideoService {
     @Transactional
     public String createVideoSlice(VideoSliceBO videoSliceBO, Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Video dbVideo = videoRepository.findById(videoSliceBO.getId()).orElseThrow(() -> new IllegalArgumentException("视频不存在"));
         Task task = new Task();
         task.setId(snowflake.nextId());
         task.setType(TaskType.SLICE);
@@ -145,7 +144,10 @@ public class VideoService {
         taskRepository.save(task);
         // TODO 未来会考虑后端与后端之间双向通信
         try {
+            Video dbVideo = videoRepository.findById(videoSliceBO.getId()).orElseThrow(IllegalArgumentException::new);
             callAgent(videoSliceBO, dbVideo, task.getId());
+        } catch (IllegalArgumentException ex) {
+            return "视频不存在";
         } catch (WebClientRequestException ex) {
             task.setStatus(TaskStatus.FAILED);
             taskRepository.save(task);
